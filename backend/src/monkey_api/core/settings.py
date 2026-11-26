@@ -15,14 +15,9 @@ _REPO_ROOT = Path(__file__).resolve().parents[4]
 
 
 def discover_adb() -> str:
-    """Locate adb: bundled platform-tools, Android SDK, then PATH."""
-    candidates = [
-        _REPO_ROOT / "adb_tools" / "platform-tools" / "adb.exe",
-        _SDK_ADB,
-    ]
-    for candidate in candidates:
-        if candidate.is_file():
-            return str(candidate)
+    """Locate adb: Android SDK, then PATH. Override with MONKEY_ADB_PATH."""
+    if _SDK_ADB.is_file():
+        return str(_SDK_ADB)
     return shutil.which("adb") or "adb"
 
 

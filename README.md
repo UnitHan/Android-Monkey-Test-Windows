@@ -1,155 +1,63 @@
-# Android Monkey 테스트 자동화 v3.0
+# Android Monkey Test Platform v4
 
-모듈화된 Android Monkey 테스트 자동화 도구입니다.
+Android Monkey 테스트 자동화 도구. REST API 백엔드(FastAPI)와 웹 UI(React)로 구성됩니다.
+v3(Python/tkinter)는 [legacy/](legacy/)에 보관되어 있고 git 태그 `legacy-v3.0`으로도 남아 있습니다.
 
-## 📁 프로젝트 구조
+## 구성
 
 ```
-c:\Monkey\
-├── monkey_v3.py              # 메인 실행 파일
-├── src/
-│   ├── __init__.py
-│   ├── config.py             # 설정 및 상수
-│   ├── core/                 # 핵심 비즈니스 로직
-│   │   ├── __init__.py
-│   │   ├── adb_client.py     # ADB 명령어 래퍼
-│   │   ├── monkey_runner.py  # Monkey 테스트 실행
-│   │   ├── performance_monitor.py  # 성능 모니터링
-│   │   ├── report_generator.py     # 리포트 생성
-│   │   └── test_context.py   # 테스트 컨텍스트 관리
-│   ├── ui/                   # UI 관련
-│   │   ├── __init__.py
-│   │   ├── main_app.py       # 메인 GUI 애플리케이션
-│   │   └── ui_utils.py       # UI 유틸리티 함수
-│   └── utils/                # 유틸리티
-│       ├── __init__.py
-│       └── logger.py         # 로깅 설정
-├── logs/                     # 로그 파일
-├── monkey_reports/           # HTML 리포트
-├── performance_logs/         # 성능 로그
-└── README.md
+backend/    FastAPI REST API (/api/v1), 세션 상태머신, ADB 어댑터, API 로그
+frontend/   React + TanStack Query UI (빌드 결과를 백엔드가 서빙)
+docs/       ARCHITECTURE.md (설계/계약/로깅/테스트 규칙), MIGRATION.md (v3 → v4)
+assets/     앱 아이콘 (Tauri 패키징용)
+legacy/     v3 소스 아카이브 (수정 금지)
 ```
 
-## 🚀 주요 개선 사항
+## 요구 사항
 
-### 1. 모듈화 및 단일 책임 원칙
-- **AdbClient**: ADB 명령어 실행 전담
-- **MonkeyRunner**: Monkey 테스트 실행 로직
-- **PerformanceMonitor**: CPU/메모리 모니터링
-- **ReportGenerator**: HTML/Excel 리포트 생성
-- **TestContext**: 테스트 상태 관리
+- Python 3.12+ 와 [uv](https://docs.astral.sh/uv/) (`python -m pip install uv`)
+- Node.js 20+ (UI 빌드 시)
+- adb: Android SDK platform-tools 또는 PATH. 다른 위치면 `MONKEY_ADB_PATH` 지정
 
-### 2. 설정 중앙화
-- **config.py**: 모든 설정과 상수를 한 곳에서 관리
-- 매직 스트링 제거 (CRASH_KEYWORDS, ANR_KEYWORDS 등)
-- 경로 설정 중앙화
-
-### 3. 로깅 개선
-- **logger.py**: 통합 로깅 설정
-- 중복 로깅 설정 제거
-- 구조화된 로그 메시지
-
-### 4. UI/비즈니스 로직 분리
-- **main_app.py**: UI 로직만 담당
-- **ui_utils.py**: 재사용 가능한 UI 컴포넌트
-- 비즈니스 로직은 core 모듈에서 처리
-
-### 5. 전역 변수 제거
-- **TestContext** 클래스로 상태 관리
-- 캡슐화된 데이터 접근
-
-## 🔧 설치 및 실행
-
-### 필요 사항
-```bash
-pip install -r requirements.txt
-```
-
-### 환경변수 설정
-1. `.env.example` 파일을 `.env`로 복사
-2. `.env` 파일에서 다음 값들을 설정:
+## 실행
 
 ```bash
-# Gemini API 키 (AI 기반 이슈 분석용)
-GEMINI_API_KEY=your_gemini_api_key_here
+# 1) UI 빌드 (최초 1회 / UI 변경 시)
+cd frontend && npm install && npm run build
+
+# 2) API + UI 서버
+cd ../backend && python -m uv sync && python -m uv run monkey-api
+# → http://127.0.0.1:8765  (API 문서: /docs)
 ```
 
-**Gemini API 키 발급 방법:**
-1. [Google AI Studio](https://makersuite.google.com/app/apikey) 방문
-2. Google 계정으로 로그인
-3. "Create API Key" 버튼 클릭
-4. 발급받은 키를 `.env` 파일에 설정
+UI 개발 시에는 `cd frontend && npm run dev` (5173 포트, /api 는 8765 로 프록시).
 
-### 실행
+## 설정 (환경 변수, 접두사 `MONKEY_`, `backend/.env` 지원)
+
+| 변수 | 기본값 | 설명 |
+|---|---|---|
+| `MONKEY_ADB_PATH` | SDK → PATH 자동 탐색 | adb 실행 파일 |
+| `MONKEY_DATA_DIR` | `%LOCALAPPDATA%\MonkeyTest` | 세션 데이터, 리포트, API 로그(`logs/api.jsonl`) |
+| `MONKEY_PORT` | `8765` | 서버 포트 |
+| `MONKEY_GEMINI_API_KEY` | 없음 | 설정 시 적응형 이벤트 조정에 Gemini 조언 사용(범위 제한됨) |
+| `MONKEY_GEMINI_MODEL` | `gemini-2.5-flash` | Gemini 모델명 |
+
+## 문제 추적
+
+모든 응답에 `X-Request-ID`가 붙고, 오류는 `application/problem+json`으로 `request_id`를 포함합니다.
+`GET /api/v1/logs?request_id=...` 또는 `?session_id=...` 로 해당 요청/세션의 HTTP, ADB 호출, 세션 이벤트
+로그를 모두 볼 수 있습니다. UI의 "API 로그" 탭과 오류 메시지의 "로그 보기" 버튼이 같은 기능입니다.
+
+## 개발
+
 ```bash
-python monkey_v3.py
+cd backend
+python -m uv run pytest                       # 단위 + API 계약 테스트 (기기 불필요)
+python -m uv run ruff check src tests && python -m uv run ruff format src tests
+python -m uv run python scripts/export_openapi.py   # API 변경 시 계약 갱신 (리뷰 대상)
+
+cd ../frontend
+npm test            # vitest
+npm run check:api   # openapi.json 과 TS 타입 동기화 확인
+npm run typecheck
 ```
-
-## 📊 주요 기능
-
-### 1. 테스트 설정
-- 프리셋 기반 테스트 (Smoke, Quick, Standard, Deep, Extreme)
-- 사용자 정의 설정
-- 예상 소요 시간 계산
-
-### 2. 성능 모니터링
-- 실시간 CPU/메모리 사용량 모니터링
-- 성능 임계값 기반 자동 분석
-- 동적 개선 제안 생성
-
-### 3. 리포트 생성
-- **HTML 리포트**: Chart.js 기반 그래프 포함
-- **Excel 리포트**: 상세 데이터 및 성능 시트
-- 자동 브라우저 열기
-
-### 4. 디바이스 관리
-- USB/무선 연결 자동 감지
-- 다중 디바이스 지원
-- 연결 상태 모니터링
-
-## 🎯 코드 품질 개선
-
-### Before vs After
-
-| 항목 | Before | After |
-|------|--------|-------|
-| 파일 수 | 1개 (2835줄) | 11개 모듈 |
-| 전역 변수 | 10+ 개 | 0개 (TestContext로 캡슐화) |
-| 클래스 책임 | 단일 클래스가 모든 역할 | 역할별 클래스 분리 |
-| 설정 관리 | 하드코딩 | config.py 중앙화 |
-| 로깅 | 중복 설정 | 통합 logger.py |
-| UI 업데이트 | 예외 무시 | safe_ui_update() 래퍼 |
-
-### 테스트 가능성
-- 각 모듈이 독립적으로 테스트 가능
-- Mock 객체 사용 가능
-- 의존성 주입 패턴 적용
-
-### 확장성
-- 새로운 테스트 도구 추가 용이
-- 리포트 형식 확장 가능
-- UI 테마 변경 용이
-
-## 🐛 문제 해결
-
-### 일반적인 문제
-1. **디바이스 연결 실패**: ADB 드라이버 및 USB 디버깅 확인
-2. **패키지 로드 실패**: 디바이스 권한 및 연결 상태 확인
-3. **성능 모니터링 오류**: 디바이스 권한 및 앱 실행 상태 확인
-
-### 로그 확인
-```
-logs/monkey_test.log  # 상세 로그
-```
-
-## 📈 향후 개선 계획
-
-1. **테스트 시나리오 지원**: 커스텀 이벤트 시퀀스
-2. **CI/CD 통합**: Jenkins/GitHub Actions 지원
-3. **클라우드 리포팅**: 웹 대시보드 연동
-4. **다중 디바이스 동시 테스트**
-5. **AI 기반 이슈 분석**
-
-## 📝 라이선스
-
-이 프로젝트는 내부 사용을 위한 도구입니다.
