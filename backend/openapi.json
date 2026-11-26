@@ -2065,7 +2065,8 @@
         "required": [
           "serial",
           "state",
-          "connection"
+          "connection",
+          "model"
         ],
         "title": "Device"
       },
@@ -2348,6 +2349,18 @@
         },
         "additionalProperties": false,
         "type": "object",
+        "required": [
+          "touch",
+          "motion",
+          "trackball",
+          "nav",
+          "majornav",
+          "syskeys",
+          "appswitch",
+          "anyevent",
+          "pinchzoom",
+          "rotation"
+        ],
         "title": "EventMix",
         "description": "Monkey --pct-* percentages. None = monkey default."
       },
@@ -2458,6 +2471,11 @@
         },
         "additionalProperties": false,
         "type": "object",
+        "required": [
+          "crash",
+          "anr",
+          "native_crash"
+        ],
         "title": "IssueCounts"
       },
       "IssueList": {
@@ -2905,8 +2923,12 @@
           "events",
           "repeats",
           "throttle_ms",
+          "target_minutes_per_run",
           "seed_mode",
-          "event_mix"
+          "fixed_seed",
+          "event_mix",
+          "bugreport",
+          "adaptive_margin"
         ],
         "title": "Preset"
       },
@@ -3034,6 +3056,14 @@
         },
         "additionalProperties": false,
         "type": "object",
+        "required": [
+          "current_run",
+          "total_runs",
+          "run_percent",
+          "events_sent",
+          "events_target",
+          "elapsed_s"
+        ],
         "title": "Progress"
       },
       "RunPerf": {
@@ -3157,7 +3187,11 @@
           "ended_at",
           "duration_s",
           "exit_code",
-          "end_reason"
+          "end_reason",
+          "crashes",
+          "anrs",
+          "mem_peak_mb",
+          "cpu_peak_percent"
         ],
         "title": "RunResult"
       },
@@ -3264,7 +3298,16 @@
           "id",
           "state",
           "config",
-          "created_at"
+          "created_at",
+          "started_at",
+          "ended_at",
+          "device",
+          "app_version",
+          "progress",
+          "runs",
+          "issue_counts",
+          "estimated_total_s",
+          "error"
         ],
         "title": "Session"
       },
@@ -3368,7 +3411,14 @@
           "repeats",
           "throttle_ms",
           "seed_mode",
-          "event_mix"
+          "seed",
+          "target_minutes_per_run",
+          "event_mix",
+          "bugreport",
+          "adaptive",
+          "adaptive_margin",
+          "keep_foreground",
+          "network_guard"
         ],
         "title": "SessionConfig"
       },

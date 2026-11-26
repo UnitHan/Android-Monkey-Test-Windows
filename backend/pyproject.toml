@@ -47,3 +47,4 @@ ignore = ["B008"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S110", "BLE001"]
+"src/monkey_api/adapters/report/html.py" = ["E501"]

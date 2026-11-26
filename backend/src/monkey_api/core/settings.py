@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     port: int = 8765
     log_level: str = "INFO"
     log_buffer_size: int = 20_000
+    ui_dir: Path | None = Field(default_factory=lambda: _REPO_ROOT / "frontend" / "dist")
     cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173", "tauri://localhost"]
 
     adb_timeout_s: float = 30.0

@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from monkey_api import __version__
 from monkey_api.adapters.adb.runner import AdbPort
@@ -59,6 +60,8 @@ def create_app(
     app.add_middleware(RequestContextMiddleware)
     for router in (system.router, devices.router, sessions.router):
         app.include_router(router, prefix=API_PREFIX, responses=problem_responses(500))
+    if settings.ui_dir is not None and (settings.ui_dir / "index.html").is_file():
+        app.mount("/", StaticFiles(directory=settings.ui_dir, html=True), name="ui")
     return app
 
 

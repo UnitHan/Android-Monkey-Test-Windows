@@ -14,8 +14,9 @@ _TEMPLATE = """<!doctype html>
 <title>Monkey Report {{ s.config.package }}</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-:root{--bg:#f7f7f8;--fg:#1d1d1f;--card:#fff;--muted:#6b6b70;--line:#e3e3e6;--bad:#c0392b;--ok:#1e8e3e}
-@media (prefers-color-scheme:dark){:root{--bg:#151517;--fg:#ececef;--card:#1f1f22;--muted:#9a9aa1;--line:#333}}
+:root{--bg:#f9f9f9;--fg:#191919;--card:#fff;--muted:#666;--line:#e7e7e7;--axis:#c2c2c2;--bad:#dc3c3d;--ok:#006c10;--s1:#257de0;--s2:#f47230}
+@media (prefers-color-scheme:dark){:root{--bg:#0b0b0b;--fg:#efefef;--card:#191919;--muted:#9c9c9c;--line:#303030;--axis:#474747;--bad:#eb6263;--ok:#53c556;--s1:#338ced;--s2:#e76624}}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
 body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 system-ui,"Noto Sans KR",sans-serif}
 main{max-width:1100px;margin:0 auto;padding:24px 16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
@@ -36,7 +37,7 @@ table{width:100%;border-collapse:collapse}th,td{padding:6px 8px;border-bottom:1p
  <div><span>ANR</span><b class="{{ 'bad' if s.issue_counts.anr else 'ok' }}">{{ s.issue_counts.anr }}</b></div>
 </div>
 <div class="card"><h2>Suggestions</h2><ul>{% for x in r.suggestions %}<li>{{ x }}</li>{% endfor %}</ul></div>
-<div class="card"><h2>Performance</h2><canvas id="perf" height="110"></canvas></div>
+<div class="card"><h2>Performance</h2><div class="charts"><figure><figcaption>Memory (PSS, MB)</figcaption><canvas id="mem" height="160"></canvas></figure><figure><figcaption>CPU (%)</figcaption><canvas id="cpu" height="160"></canvas></figure></div></div>
 <div class="card"><h2>Runs</h2><table><tr><th>#</th><th>Seed</th><th>Events</th><th>Duration</th>
 <th>End</th><th>Crash</th><th>ANR</th><th>Mem peak</th><th>CPU peak</th></tr>
 {% for x in s.runs %}<tr><td>{{ x.run }}</td><td>{{ x.seed }}</td><td>{{ x.events_sent }}/{{ x.events_target }}</td>
@@ -49,10 +50,19 @@ table{width:100%;border-collapse:collapse}th,td{padding:6px 8px;border-bottom:1p
 <script id="data" type="application/json">{{ samples_json }}</script>
 <script>
 const d = JSON.parse(document.getElementById('data').textContent);
-new Chart(document.getElementById('perf'), {type: 'line', data: {labels: d.map(x => x.at.slice(11, 19)),
- datasets: [{label: 'Memory MB', data: d.map(x => x.memory_mb), yAxisID: 'm', pointRadius: 0},
-            {label: 'CPU %', data: d.map(x => x.cpu_percent), yAxisID: 'c', pointRadius: 0}]},
- options: {animation: false, scales: {m: {position: 'left'}, c: {position: 'right', max: 100}}}});
+const css = getComputedStyle(document.documentElement), v = n => css.getPropertyValue(n).trim();
+const labels = d.map(x => x.at.slice(11, 19));
+function line(id, label, values, color, max) {
+  new Chart(document.getElementById(id), {type: 'line',
+    data: {labels, datasets: [{label, data: values, borderColor: color, borderWidth: 2, pointRadius: 0,
+                               pointHoverRadius: 4, spanGaps: true, tension: 0}]},
+    options: {animation: false, interaction: {mode: 'index', intersect: false},
+      plugins: {legend: {display: false}},
+      scales: {x: {ticks: {color: v('--muted'), maxTicksLimit: 6}, grid: {display: false}, border: {color: v('--axis')}},
+               y: {beginAtZero: true, max, ticks: {color: v('--muted')}, grid: {color: v('--line')}, border: {display: false}}}}});
+}
+line('mem', 'Memory MB', d.map(x => x.memory_mb), v('--s1'));
+line('cpu', 'CPU %', d.map(x => x.cpu_percent), v('--s2'), 100);
 </script></body></html>
 """
 
