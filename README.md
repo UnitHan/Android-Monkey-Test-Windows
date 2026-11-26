@@ -54,6 +54,17 @@ USB 또는 무선 ADB로 연결한 Android 단말에 Monkey 이벤트를 주입�
 대상 PC에 Python·Node.js·Java·Android SDK를 별도로 설치할 필요가 없습니다. 단말 제조사 USB 드라이버가 필요한 경우는 있습니다.
 Google Play 및 Gemini 기능은 인터넷과 해당 서비스의 사용 권한이 필요합니다.
 
+### 기존 설치 업데이트
+
+테스트를 완료하고 앱을 닫은 뒤 새 버전 설치 EXE를 실행합니다. 설치 관리자가 기존 버전과 설치 경로를 감지하므로 같은 경로에 업데이트할 수 있습니다.
+프로그램 파일과 사용자 데이터는 분리돼 있으며, `%LOCALAPPDATA%\MonkeyTest`의 Google 인증·Gemini 키·테스트 이력은 유지합니다.
+업데이트 후 기존 설정이 있으면 배포 암호를 다시 입력하지 않습니다.
+실행 중인 앱의 종료를 묻는 안내가 나오면 진행 중인 테스트를 먼저 마무리하세요.
+관리용 무인 업데이트는 앱 종료 후 `설치파일.exe /S /UPDATE`로 실행할 수 있습니다.
+
+시작 시 8765 포트가 이미 사용 중이면 기존 앱 또는 개발용 백엔드를 확인합니다.
+시작 오류는 안내창과 `%LOCALAPPDATA%\MonkeyTest\logs\shell-startup.log`에 표시됩니다.
+
 ### 소스 개발 환경
 
 Python 3.12+, Node.js 20+, Rust stable/MSVC, Windows C++ 빌드 도구, WebView2와 ADB를 준비합니다.

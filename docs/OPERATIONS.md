@@ -55,6 +55,17 @@ Google 클라이언트·로그인·Gemini 키 중 하나라도 없으면 빈 설
 `scripts/verify_runtime.py`는 개발 도구를 제외한 PATH와 임시 사용자 폴더에서 독립 백엔드,
 내장 ADB, 암호화 키 재시작 유지, HTML·엑셀 생성을 검증합니다. 클린 Windows VM 검증과는 별개입니다.
 
+## 기존 설치 업데이트와 시작 오류
+
+설치 업데이트는 기존 앱을 닫은 뒤 새 설치 EXE를 실행합니다. NSIS가 기존 버전과 설치 경로를 감지하며,
+사용자 데이터는 설치 경로와 별개인 `%LOCALAPPDATA%\MonkeyTest`에 남습니다. Google OAuth·Gemini 키·
+세션 이력은 업데이트 후에도 유지하고, 기존 인증정보가 있는 PC에는 배포 설정을 덮어쓰지 않습니다.
+관리용 업데이트는 `설치파일.exe /S /UPDATE`로 실행할 수 있습니다. 실행 중인 테스트를 먼저 마무리하세요.
+
+설치 앱이 시작하지 못하면 8765 포트의 기존 앱·개발 백엔드 점유 여부와
+`%LOCALAPPDATA%\MonkeyTest\logs\shell-startup.log`, `backend-startup.log`를 확인합니다.
+시작 실패 시 원인과 조치 방법을 Windows 안내창에 표시합니다.
+
 ## 개발 환경 요구 사항
 
 - Python 3.12+ (백엔드는 `backend/.venv` 가상환경에서 실행)
