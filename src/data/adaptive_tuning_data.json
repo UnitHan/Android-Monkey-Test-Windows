@@ -1,0 +1,686 @@
+{
+  "Extreme Test": {
+    "results": [
+      {
+        "events": 30000,
+        "throttle": 180,
+        "duration_minutes": 29.706542174021404,
+        "package": "unknown",
+        "timestamp": 1753339197.1877384,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32466,
+        "throttle": 180,
+        "duration_minutes": 32.315737545490265,
+        "package": "unknown",
+        "timestamp": 1753341154.367588,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32372,
+        "throttle": 180,
+        "duration_minutes": 32.3527461250623,
+        "package": "unknown",
+        "timestamp": 1753343113.0569952,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32299,
+        "throttle": 180,
+        "duration_minutes": 13.635851935545604,
+        "package": "unknown",
+        "timestamp": 1753343948.6034052,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32500,
+        "throttle": 180,
+        "duration_minutes": 32.01808089415233,
+        "package": "unknown",
+        "timestamp": 1753347772.1115408,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32637,
+        "throttle": 180,
+        "duration_minutes": 34.80003447532654,
+        "package": "unknown",
+        "timestamp": 1753349878.137706,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 34457,
+        "throttle": 180,
+        "duration_minutes": 34.173861134052274,
+        "package": "unknown",
+        "timestamp": 1753351946.2162094,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32500,
+        "throttle": 180,
+        "duration_minutes": 32.36164110104243,
+        "package": "unknown",
+        "timestamp": 1753353905.675756,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32500,
+        "throttle": 180,
+        "duration_minutes": 32.31946827173233,
+        "package": "unknown",
+        "timestamp": 1753355862.9051023,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32500,
+        "throttle": 180,
+        "duration_minutes": 35.16334750254949,
+        "package": "unknown",
+        "timestamp": 1753357990.6201923,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32500,
+        "throttle": 180,
+        "duration_minutes": 33.14231458902359,
+        "package": "unknown",
+        "timestamp": 1753359997.3125546,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32500,
+        "throttle": 180,
+        "duration_minutes": 34.9797607978185,
+        "package": "unknown",
+        "timestamp": 1753362114.0563822,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32500,
+        "throttle": 180,
+        "duration_minutes": 32.32035133838654,
+        "package": "unknown",
+        "timestamp": 1753364071.5766838,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32500,
+        "throttle": 180,
+        "duration_minutes": 32.30430023272832,
+        "package": "unknown",
+        "timestamp": 1753366027.9863987,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32500,
+        "throttle": 180,
+        "duration_minutes": 32.47613179286321,
+        "package": "unknown",
+        "timestamp": 1753367994.6451907,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32500,
+        "throttle": 180,
+        "duration_minutes": 32.42380735874176,
+        "package": "unknown",
+        "timestamp": 1753369958.2803614,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32500,
+        "throttle": 180,
+        "duration_minutes": 32.285238881905876,
+        "package": "unknown",
+        "timestamp": 1753371913.6498897,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32500,
+        "throttle": 180,
+        "duration_minutes": 35.000000953674316,
+        "package": "unknown",
+        "timestamp": 1753374031.9519606,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 32500,
+        "throttle": 180,
+        "duration_minutes": 32.52825142939886,
+        "package": "unknown",
+        "timestamp": 1753376002.1606183,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      }
+    ],
+    "optimized_params": {},
+    "last_update": 1753376002.1606183
+  },
+  "Smoke Test": {
+    "results": [
+      {
+        "events": 3500,
+        "throttle": 300,
+        "duration_minutes": 6.868653885523478,
+        "package": "unknown",
+        "timestamp": 1753406257.2237937,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 3500,
+        "throttle": 300,
+        "duration_minutes": 6.709665064016978,
+        "package": "unknown",
+        "timestamp": 1753406677.7995176,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 3500,
+        "throttle": 300,
+        "duration_minutes": 3.2337506969769794,
+        "package": "unknown",
+        "timestamp": 1753406889.435708,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 3500,
+        "throttle": 300,
+        "duration_minutes": 6.678473707040151,
+        "package": "unknown",
+        "timestamp": 1753408223.637879,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 3681,
+        "throttle": 300,
+        "duration_minutes": 7.270671983559926,
+        "package": "unknown",
+        "timestamp": 1753408677.4589708,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 3500,
+        "throttle": 300,
+        "duration_minutes": 6.693070582548777,
+        "package": "unknown",
+        "timestamp": 1753409096.7124438,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 3630,
+        "throttle": 300,
+        "duration_minutes": 6.768945169448853,
+        "package": "unknown",
+        "timestamp": 1753409520.619887,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 3500,
+        "throttle": 300,
+        "duration_minutes": 6.353195567925771,
+        "package": "unknown",
+        "timestamp": 1753409919.2784412,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      }
+    ],
+    "optimized_params": {},
+    "last_update": 1753409919.2784412
+  },
+  "Quick Test": {
+    "results": [
+      {
+        "events": 6500,
+        "throttle": 220,
+        "duration_minutes": 8.338309717178344,
+        "package": "unknown",
+        "timestamp": 1753431512.9980278,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7474,
+        "throttle": 220,
+        "duration_minutes": 9.79378722111384,
+        "package": "unknown",
+        "timestamp": 1753432116.9382691,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7721,
+        "throttle": 220,
+        "duration_minutes": 10.147061153252919,
+        "package": "unknown",
+        "timestamp": 1753432742.0259132,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7688,
+        "throttle": 220,
+        "duration_minutes": 10.114006026585896,
+        "package": "unknown",
+        "timestamp": 1753433365.3433316,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7612,
+        "throttle": 220,
+        "duration_minutes": 9.902875876426696,
+        "package": "unknown",
+        "timestamp": 1753433975.9322612,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7750,
+        "throttle": 220,
+        "duration_minutes": 9.941285840670268,
+        "package": "unknown",
+        "timestamp": 1753438828.3572397,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7771,
+        "throttle": 220,
+        "duration_minutes": 6.303900774319967,
+        "package": "unknown",
+        "timestamp": 1753439223.630143,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7750,
+        "throttle": 220,
+        "duration_minutes": 10.603965286413828,
+        "package": "unknown",
+        "timestamp": 1753657208.9947817,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7750,
+        "throttle": 220,
+        "duration_minutes": 9.90615504582723,
+        "package": "unknown",
+        "timestamp": 1753657822.1984417,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7750,
+        "throttle": 220,
+        "duration_minutes": 10.175570638974508,
+        "package": "unknown",
+        "timestamp": 1753658450.4746966,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7750,
+        "throttle": 220,
+        "duration_minutes": 10.094544386863708,
+        "package": "unknown",
+        "timestamp": 1753659074.5325284,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7750,
+        "throttle": 220,
+        "duration_minutes": 10.430426645278931,
+        "package": "unknown",
+        "timestamp": 1753659718.8533733,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7750,
+        "throttle": 220,
+        "duration_minutes": 10.30634982585907,
+        "package": "unknown",
+        "timestamp": 1753661399.673301,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7750,
+        "throttle": 220,
+        "duration_minutes": 1.5253966212272645,
+        "package": "unknown",
+        "timestamp": 1753661509.4138849,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7750,
+        "throttle": 220,
+        "duration_minutes": 0.39014821449915565,
+        "package": "unknown",
+        "timestamp": 1753662276.2919612,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7750,
+        "throttle": 220,
+        "duration_minutes": 10.418608637650808,
+        "package": "unknown",
+        "timestamp": 1753663487.2336605,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7750,
+        "throttle": 220,
+        "duration_minutes": 10.37869562705358,
+        "package": "unknown",
+        "timestamp": 1753664126.890101,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7750,
+        "throttle": 220,
+        "duration_minutes": 10.39879199663798,
+        "package": "unknown",
+        "timestamp": 1753664766.9363792,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7750,
+        "throttle": 220,
+        "duration_minutes": 10.337129497528077,
+        "package": "unknown",
+        "timestamp": 1753665403.2378712,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 7750,
+        "throttle": 220,
+        "duration_minutes": 10.04468408425649,
+        "package": "unknown",
+        "timestamp": 1753666022.2471576,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      }
+    ],
+    "optimized_params": {},
+    "last_update": 1753666022.2471576
+  },
+  "Standard Test": {
+    "results": [
+      {
+        "events": 12000,
+        "throttle": 200,
+        "duration_minutes": 14.924322120348613,
+        "package": "unknown",
+        "timestamp": 1753668320.5711868,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 12000,
+        "throttle": 200,
+        "duration_minutes": 14.792189240455627,
+        "package": "unknown",
+        "timestamp": 1753672486.5202606,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 12000,
+        "throttle": 200,
+        "duration_minutes": 14.457395120461781,
+        "package": "unknown",
+        "timestamp": 1753677911.0545542,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 12447,
+        "throttle": 200,
+        "duration_minutes": 15.563634947935741,
+        "package": "unknown",
+        "timestamp": 1753678861.3570402,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 12203,
+        "throttle": 200,
+        "duration_minutes": 15.193202877044678,
+        "package": "unknown",
+        "timestamp": 1753679789.2770708,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 12149,
+        "throttle": 200,
+        "duration_minutes": 15.103710782527923,
+        "package": "unknown",
+        "timestamp": 1753680712.4098785,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 12020,
+        "throttle": 200,
+        "duration_minutes": 15.011927044391632,
+        "package": "unknown",
+        "timestamp": 1753681630.0932243,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      },
+      {
+        "events": 12025,
+        "throttle": 200,
+        "duration_minutes": 15.019862886269888,
+        "package": "unknown",
+        "timestamp": 1753682548.0715957,
+        "device_info": {
+          "model": "unknown",
+          "android_version": "unknown",
+          "cpu_info": "unknown"
+        }
+      }
+    ],
+    "optimized_params": {},
+    "last_update": 1753682548.0715957
+  }
+}
