@@ -9,9 +9,11 @@ from pydantic import ValidationError
 from monkey_api.core.errors import DeviceBusy, SessionActive, ValidationFailed
 from monkey_api.core.ids import new_id, utc_now
 from monkey_api.core.logging import log, session_id_var
+from monkey_api.domain.estimation import expected_events
 from monkey_api.domain.models import Preset, Session, SessionConfig, SessionOverrides, SessionState
 from monkey_api.domain.presets import get_preset
 from monkey_api.domain.state_machine import ACTIVE_STATES, TERMINAL_STATES, ensure_transition
+from monkey_api.services.report_export import delete_export
 from monkey_api.services.session_ledger import SessionLedger
 from monkey_api.services.session_runner import SessionRunner
 
@@ -32,6 +34,19 @@ def resolve_config(
         raise ValidationFailed("invalid session configuration", errors=exc.errors(include_url=False)) from exc
 
 
+def _target(preset: Preset, o: SessionOverrides) -> float | None:
+    return o.target_minutes_per_run or preset.target_minutes_per_run
+
+
+def _events(preset: Preset, o: SessionOverrides) -> int:
+    """Explicit events win; otherwise time-boxed configs derive events from the time rule."""
+    if o.events:
+        return o.events
+    target = _target(preset, o)
+    throttle = o.throttle_ms if o.throttle_ms is not None else preset.throttle_ms
+    return expected_events(target, throttle) if target is not None else preset.events
+
+
 def _build_config(
     device_serial: str, package: str, preset: Preset, o: SessionOverrides, seed: int | None
 ) -> SessionConfig:
@@ -39,12 +54,12 @@ def _build_config(
         device_serial=device_serial,
         package=package,
         preset_id=preset.id,
-        events=o.events or preset.events,
+        events=_events(preset, o),
         repeats=o.repeats or preset.repeats,
         throttle_ms=o.throttle_ms if o.throttle_ms is not None else preset.throttle_ms,
         seed_mode="manual" if o.seed is not None else preset.seed_mode,
         seed=seed,
-        target_minutes_per_run=o.target_minutes_per_run or preset.target_minutes_per_run,
+        target_minutes_per_run=_target(preset, o),
         event_mix=preset.event_mix,
         bugreport=preset.bugreport,
         adaptive=o.adaptive if o.adaptive is not None else preset.adaptive_margin > 0,
@@ -103,9 +118,12 @@ class SessionService:
 
     def delete(self, session_id: str) -> None:
         session = self.ledger.get(session_id)
-        if session.state not in TERMINAL_STATES and session.state != SessionState.CREATED:
+        if self.is_running(session_id) or (
+            session.state not in TERMINAL_STATES and session.state != SessionState.CREATED
+        ):
             raise SessionActive(f"session '{session_id}' is {session.state.value}; stop it first")
-        self.ledger.repo.delete(session_id)
+        delete_export(session_id, self.runner.deps.settings.export_dir)
+        self.ledger.delete(session_id)
         log("session", "session deleted", session_id=session_id)
 
     def is_running(self, session_id: str) -> bool:

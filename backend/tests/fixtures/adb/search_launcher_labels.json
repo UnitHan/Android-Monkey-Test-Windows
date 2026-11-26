@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "labels": {
+    "com.google.android.youtube": "YouTube",
+    "com.teamblind.blind": "blind",
+    "com.lguplus.aicallagent": "익시오",
+    "com.lguplus.remocon": "U+tv모바일",
+    "com.nhn.android.search": "NAVER",
+    "com.sec.imslogger": "ImsLogger"
+  },
+  "launchers": {
+    "com.google.android.youtube": [
+      "YouTube"
+    ],
+    "com.teamblind.blind": [
+      "blind"
+    ],
+    "com.lguplus.aicallagent": [
+      "익시오"
+    ],
+    "com.lguplus.remocon": [
+      "U+tv모바일"
+    ],
+    "com.nhn.android.search": [
+      "NAVER"
+    ]
+  }
+}

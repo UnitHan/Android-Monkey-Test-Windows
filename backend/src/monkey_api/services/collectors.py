@@ -15,6 +15,7 @@ from monkey_api.core.ids import new_id, utc_now
 from monkey_api.core.logging import log
 from monkey_api.domain.logcat_analyzer import DetectedIssue, LogcatAnalyzer
 from monkey_api.domain.models import Issue, PerfSample
+from monkey_api.services.foreground_guard import guard_foreground
 
 IssueSink = Callable[[Issue], None]
 PerfSink = Callable[[PerfSample], None]
@@ -69,25 +70,31 @@ async def guard_app_state(
     network_guard: bool,
     on_event: Callable[[str, dict[str, object]], None],
 ) -> None:
-    """Keep the app in foreground and the network up (legacy foreground/network monitors)."""
-    misses = 0
+    """Foreground uses resume events; network checks retain their separate interval."""
+    tasks = []
+    if keep_foreground:
+        tasks.append(asyncio.create_task(guard_foreground(ops, serial, package, on_event)))
+    if network_guard:
+        tasks.append(asyncio.create_task(_guard_network(ops, serial, interval_s, on_event)))
+    try:
+        await asyncio.gather(*tasks)
+    finally:
+        for task in tasks:
+            task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+
+
+async def _guard_network(
+    ops: DeviceOps, serial: str, interval_s: float, on_event: Callable[[str, dict[str, object]], None]
+) -> None:
     while True:
         await asyncio.sleep(interval_s)
         try:
-            if keep_foreground:
-                fg = await ops.foreground_package(serial)
-                misses = misses + 1 if fg is not None and fg != package else 0
-                if misses >= 2:
-                    log("session", "app left foreground, relaunching", "WARNING", foreground=fg)
-                    await ops.launch(serial, package)
-                    on_event("guard", {"action": "relaunch", "foreground": fg})
-                    misses = 0
-            if network_guard:
-                if await ops.global_setting(serial, "airplane_mode_on"):
-                    await ops.disable_airplane_mode(serial)
-                    on_event("guard", {"action": "airplane_mode_disabled"})
-                if await ops.global_setting(serial, "mobile_data") is False:
-                    await ops.enable_mobile_data(serial)
-                    on_event("guard", {"action": "mobile_data_enabled"})
+            if await ops.global_setting(serial, "airplane_mode_on"):
+                await ops.disable_airplane_mode(serial)
+                on_event("guard", {"action": "airplane_mode_disabled"})
+            if await ops.global_setting(serial, "mobile_data") is False:
+                await ops.enable_mobile_data(serial)
+                on_event("guard", {"action": "mobile_data_enabled"})
         except AdbError as exc:
             log("session", "guard check failed", "WARNING", error=exc.detail, code=exc.code)

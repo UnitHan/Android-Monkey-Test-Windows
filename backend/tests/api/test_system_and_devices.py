@@ -22,7 +22,7 @@ def test_request_id_is_echoed_and_logged(api: ContractClient) -> None:
 
 def test_presets_and_estimate(api: ContractClient) -> None:
     presets = api.get("/presets").json()["items"]
-    assert {p["id"] for p in presets} >= {"smoke", "quick", "standard", "deep", "extreme", "reproduce"}
+    assert {p["id"] for p in presets} == {"smoke", "standard", "deep", "extreme", "reproduce", "custom"}
     est = api.post("/estimates", json={"events": 12000, "repeats": 6, "throttle_ms": 200,
                                        "target_minutes_per_run": 15}).json()  # fmt: skip
     assert est["per_run_s"] == 900 and est["total_s"] > 900 * 6
@@ -77,7 +77,7 @@ def test_packages_filtered_named_and_searchable(api: ContractClient) -> None:
     assert "com.android.settings" not in names and PACKAGE in names  # system packages filtered
     all_pkgs = api.get(f"/devices/{SERIAL}/packages", params={"include_system": True}).json()
     named = {p["name"]: p["display_name"] for p in all_pkgs["items"]}
-    assert named["com.sec.imslogger"] == "ImsLogger"  # from bundled catalog
+    assert named["com.sec.imslogger"] == "com.sec.imslogger"  # no device label: no stale catalog name
     found = api.get(f"/devices/{SERIAL}/packages", params={"query": "ims", "include_system": True}).json()
     assert [p["name"] for p in found["items"]] == ["com.sec.imslogger"]
 
@@ -115,7 +115,8 @@ def test_reboot_and_launch(api: ContractClient, adb: FakeAdb) -> None:
     assert api.post(f"/devices/{SERIAL}/reboot").json() == {"message": "reboot requested"}
     assert adb.called("reboot") == 1
     assert api.post(f"/devices/{SERIAL}/packages/{PACKAGE}/launch").status_code == 204
-    assert any(args[:3] == ("shell", "monkey", "-p") and args[-1] == "1" for args, _ in adb.calls)
+    assert any(args[:3] == ("shell", "am", "start") and args[-1] == f"{PACKAGE}/.MainActivity" for args, _ in adb.calls)
+    assert adb.called("shell", "monkey") == 0
     assert api.post("/devices/NOPE1/reboot").status_code == 404
     assert api.post(f"/devices/{SERIAL}/packages/bad%20pkg/launch").status_code == 422
 

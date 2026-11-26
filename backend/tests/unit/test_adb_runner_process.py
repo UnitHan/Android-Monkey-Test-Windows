@@ -45,6 +45,14 @@ async def test_stream_lines_and_terminate() -> None:
     assert await stream.terminate(grace_s=2) is not None
 
 
+async def test_stream_drains_large_stderr_without_blocking_completion() -> None:
+    stream = await PY.stream(["-c", "import sys; sys.stderr.write('x'*200000); print('done', flush=True)"])
+    assert [line async for line in stream.lines()] == ["done"]
+    assert await stream.wait() == 0
+    assert len(await stream.stderr_text()) == 4096
+    assert await stream.terminate() == 0
+
+
 async def test_logging_decorator_records_ok_failed_and_errors() -> None:
     store = LogStore()
     configure_logging(store, "WARNING")

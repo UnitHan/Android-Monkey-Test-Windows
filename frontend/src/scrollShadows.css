@@ -1,0 +1,28 @@
+/* Preserve native scrolling; replace the visible track with content-edge shadows.
+   Local cover gradients move with the content and reveal the fixed shadows. */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+:is(.tk-text, .tk-listbox, .tk-tree, .tk-body, .console-text,
+       .dashboard-workspace, .main-content, .chart-table, .resource-table, .ai-preview) {
+  --scroll-surface: #fff;
+  --scroll-shadow: rgb(35 48 66 / .22);
+  background-image:
+    linear-gradient(to bottom, var(--scroll-surface) 35%, transparent),
+    linear-gradient(to top, var(--scroll-surface) 35%, transparent),
+    linear-gradient(to right, var(--scroll-surface) 35%, transparent),
+    linear-gradient(to left, var(--scroll-surface) 35%, transparent),
+    radial-gradient(farthest-side at 50% 0, var(--scroll-shadow), transparent),
+    radial-gradient(farthest-side at 50% 100%, var(--scroll-shadow), transparent),
+    radial-gradient(farthest-side at 0 50%, var(--scroll-shadow), transparent),
+    radial-gradient(farthest-side at 100% 50%, var(--scroll-shadow), transparent);
+  background-position: top, bottom, left, right, top, bottom, left, right;
+  background-size: 100% 36px, 100% 36px, 36px 100%, 36px 100%,
+                   100% 12px, 100% 12px, 12px 100%, 12px 100%;
+  background-repeat: no-repeat;
+  background-attachment: local, local, local, local, scroll, scroll, scroll, scroll;
+}
+.tk-body { --scroll-surface: var(--frame, #dcdad5); }
+.main-content { --scroll-surface: var(--frame, #dcdad5); }
+.dashboard-workspace { --scroll-surface: #f3f6fa; }
+.console-text { --scroll-surface: #000; --scroll-shadow: rgb(170 190 210 / .3); }

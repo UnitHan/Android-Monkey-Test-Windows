@@ -8,7 +8,8 @@ Read docs/ARCHITECTURE.md before changing code. Summary of the binding rules:
 - Session state changes only through `SessionLedger` (via `SessionService` commands / `SessionRunner`).
   Legal transitions live in `domain/state_machine.py` only.
 - Frontend: server state only in TanStack Query (+ SSE cache patching in `api/hooks.ts`); no global copies.
-- `legacy/` is a read-only archive. Never import from it or edit it.
+- Old application sources were removed from the working tree at the user's request. Historical code is available at Git tag `legacy-v3.0`; do not restore or depend on it for runtime/builds.
+- Keep the required Noto Sans KR fonts. `legacy/fonts/` preserves the originals; runtime copies are in `frontend/public/fonts/`. These assets must not be removed during old-source cleanup.
 
 ## Contract & logging
 - `backend/openapi.json` is the contract. API change → `python scripts/export_openapi.py` (backend venv),

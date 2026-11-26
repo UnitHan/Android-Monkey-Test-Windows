@@ -5,17 +5,65 @@ from __future__ import annotations
 from dataclasses import asdict
 
 from fastapi import APIRouter, Depends, Query
+from pydantic import SecretStr
 
 from monkey_api import __version__
 from monkey_api.api.container import Container, get_container
 from monkey_api.api.errors import problem_responses
-from monkey_api.api.schemas import AdbStatus, EstimateIn, Health, LogList, LogRecordOut, PresetList
-from monkey_api.core.errors import AdbError
+from monkey_api.api.routes.play_auth import require_local_settings
+from monkey_api.api.schemas import (
+    AdbStatus,
+    AiSettingsIn,
+    AiSettingsOut,
+    EstimateIn,
+    Health,
+    LogList,
+    LogRecordOut,
+    PresetList,
+)
+from monkey_api.core.errors import AdbError, ValidationFailed
 from monkey_api.core.logging import LogLevel, LogQuery, LogSource
 from monkey_api.domain.estimation import Estimate, estimate_duration
 from monkey_api.domain.presets import PRESETS
+from monkey_api.services.secure_settings import ai_path
 
 router = APIRouter(tags=["system"])
+
+
+@router.get("/settings/ai", response_model=AiSettingsOut)
+async def ai_settings(c: Container = Depends(get_container)) -> AiSettingsOut:
+    """Never returns the API key or calls Gemini."""
+    return AiSettingsOut(
+        configured=bool(c.settings.gemini_api_key),
+        enabled=c.ai_advisor,
+        model=c.settings.gemini_model,
+        config_file=str(ai_path(c.settings)),
+    )
+
+
+@router.put(
+    "/settings/ai",
+    response_model=AiSettingsOut,
+    responses=problem_responses(403, 422),
+    dependencies=[Depends(require_local_settings)],
+)
+async def configure_ai(body: AiSettingsIn, c: Container = Depends(get_container)) -> AiSettingsOut:
+    key = body.api_key.get_secret_value().strip()
+    if not key:
+        raise ValidationFailed("API 키를 입력해 주세요.")
+    c.configure_ai(SecretStr(key), body.model)
+    return await ai_settings(c)
+
+
+@router.delete(
+    "/settings/ai",
+    response_model=AiSettingsOut,
+    responses=problem_responses(403),
+    dependencies=[Depends(require_local_settings)],
+)
+async def delete_ai(c: Container = Depends(get_container)) -> AiSettingsOut:
+    c.configure_ai(None, c.settings.gemini_model)
+    return await ai_settings(c)
 
 
 @router.get("/health", response_model=Health)
@@ -39,6 +87,8 @@ async def list_presets() -> PresetList:
 
 @router.post("/estimates", response_model=Estimate, responses=problem_responses(422))
 async def estimate(body: EstimateIn) -> Estimate:
+    if body.events is None and body.target_minutes_per_run is None:
+        raise ValidationFailed("events or target_minutes_per_run is required")
     return estimate_duration(body.events, body.repeats, body.throttle_ms, body.target_minutes_per_run)
 
 

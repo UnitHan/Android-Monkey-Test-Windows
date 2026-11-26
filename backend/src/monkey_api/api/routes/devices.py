@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, Path
 from monkey_api.api.container import Container, get_container
 from monkey_api.api.errors import problem_responses
 from monkey_api.api.schemas import AcceptedOut, ConnectIn, ConnectOut, DeviceList, PackageList, PairIn, PairOut, TcpipIn
+from monkey_api.domain.icon import AppIcon
 from monkey_api.domain.models import PACKAGE_PATTERN, DeviceInfo, PackageVersion
 
 router = APIRouter(prefix="/devices", tags=["devices"])
@@ -62,10 +63,13 @@ async def list_packages(
     query: str | None = None,
     include_system: bool = False,
     third_party: bool = False,
+    refresh: bool = False,
     c: Container = Depends(get_container),
 ) -> PackageList:
     await c.ops.require_device(serial)
-    items = await c.packages.list(serial, query=query, include_system=include_system, third_party=third_party)
+    items = await c.packages.list(
+        serial, query=query, include_system=include_system, third_party=third_party, refresh=refresh
+    )
     return PackageList(items=items, total=len(items))
 
 
@@ -82,3 +86,10 @@ async def launch_package(
 ) -> None:
     await c.ops.require_device(serial)
     await c.ops.launch(serial, package)
+
+
+@router.get("/{serial}/packages/{package}/icon", response_model=AppIcon, responses=_ADB_ERRORS)
+async def package_icon(
+    serial: str = Serial, package: str = PackageName, c: Container = Depends(get_container)
+) -> AppIcon:
+    return await c.icons.get(serial, package)

@@ -1,0 +1,436 @@
+145 activities found:
+  Activity #0:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.android.chrome/com.google.android.apps.chrome.Main
+  Activity #1:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.android.settings/.Settings
+  Activity #2:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.android.vending/.AssetBrowserActivity
+  Activity #3:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.google.android.apps.maps/com.google.android.maps.MapsActivity
+  Activity #4:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.google.android.apps.tachyon/.MainActivity
+  Activity #5:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.google.android.gm/.ConversationListActivityGmail
+  Activity #6:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.google.android.youtube/.app.honeycomb.Shell$HomeActivity
+  Activity #7:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.samsung.android.app.contacts/com.samsung.android.contacts.contactslist.PeopleActivity
+  Activity #8:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.samsung.android.calendar/com.samsung.android.app.calendar.activity.MainActivity
+  Activity #9:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.samsung.android.dialer/.DialtactsActivity
+  Activity #10:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.samsung.android.messaging/com.android.mms.ui.ConversationComposer
+  Activity #11:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.sec.android.app.camera/.Camera
+  Activity #12:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.sec.android.gallery3d/com.samsung.android.gallery.app.activity.GalleryActivity
+  Activity #13:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.bgfcu.membership/.view.activity.IntroActivity
+  Activity #14:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.brave.browser/com.google.android.apps.chrome.Main
+  Activity #15:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.coupang.mobile.play/com.coupang.mobile.video.features.splash.SplashActivity
+  Activity #16:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.google.android.apps.docs/.app.NewMainProxyActivity
+  Activity #17:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.google.android.apps.docs.editors.sheets/com.google.android.apps.docs.app.NewMainProxyActivity
+  Activity #18:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.kakao.talk/.activity.SplashActivity
+  Activity #19:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.ktmusic.geniemusic/.Default
+  Activity #20:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.microsoft.emmx/com.microsoft.ruby.Main
+  Activity #21:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.naver.vibe/.MainHolderActivity
+  Activity #22:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.sec.android.app.sbrowser/.SBrowserMainActivity
+  Activity #23:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    com.sec.android.app.shealth/com.samsung.android.app.shealth.home.HomeMainActivity
+  Activity #24:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=true
+    viva.republica.toss/.splash.SplashActivity
+  Activity #25:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.google.android.apps.bard/.shellapp.BardEntryPointActivity
+  Activity #26:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.google.android.googlequicksearchbox/.SearchActivity
+  Activity #27:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lguplus.appstore/com.onestore.default_launcher
+  Activity #28:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lguplus.mobile.cs/.activity.main.MainActivity
+  Activity #29:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.samsung.android.app.notes/.memolist.MemoListActivity
+  Activity #30:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.samsung.android.app.reminder/.ui.LaunchMainActivity
+  Activity #31:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.samsung.android.app.spage/.main.LauncherActivity
+  Activity #32:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.samsung.android.game.gamehome/.app.MainActivity
+  Activity #33:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.samsung.android.mdx/.windowslink.tileservice.LinkToWidowsLauncherActivityDummy
+  Activity #34:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.samsung.android.samsungpass/.launcher.EntryLauncher
+  Activity #35:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.sec.android.app.clockpackage/.ClockPackage
+  Activity #36:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.sec.android.app.fm/.MainActivity
+  Activity #37:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.sec.android.app.myfiles/.ui.MainActivity
+  Activity #38:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.sec.android.app.samsungapps/.SamsungAppsMainActivity
+  Activity #39:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.sec.android.easyMover/.ui.launch.LauncherActivity
+  Activity #40:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    ai.apptest.android.keyboard/com.simplemobiletools.keyboard.activities.SplashActivity.Orange
+  Activity #41:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    app.kr.go.bokjiro/com.nprotect.mobilesdk_inapp.demo.LoadingActivity
+  Activity #42:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.ahnlab.v3mobileplus/.mainwebview.SplashActivity
+  Activity #43:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.aide.mobilestudio/.BuildBootActivity
+  Activity #44:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.alibaba.aliexpresshd/com.aliexpress.app.FirstActivity
+  Activity #45:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.anthropic.claude/.mainactivity.MainActivity
+  Activity #46:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.atlassian.android.confluence.core/com.atlassian.confluence.LauncherActivity
+  Activity #47:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.atlassian.android.jira.core/.app.LauncherActivity
+  Activity #48:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.azure.authenticator/.ui.LaunchActivity
+  Activity #49:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.coupang.mobile/.alias.dummy
+  Activity #50:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.cpuid.cpu_z/.MainActivity
+  Activity #51:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.cxinventor.file.explorer/com.alphainventor.filemanager.activity.MainActivity
+  Activity #52:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.cylonid.nativealpha/.MainActivity
+  Activity #53:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.damylola.prodev/.OptionsActivity
+  Activity #54:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.deploygate/.activity.MainActivity
+  Activity #55:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.dnsinfo.live/.MainActivity
+  Activity #56:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.exampass.istqb.ai/.MainActivity
+  Activity #57:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.example.adbkeeper/.MainActivity
+  Activity #58:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.figma.mirror/com.figma.figma.MainActivity
+  Activity #59:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.github.android/.main.MainActivity
+  Activity #60:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.github.uiautomator/.MainActivity
+  Activity #61:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.google.ai.edge.gallery/.MainActivity
+  Activity #62:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.google.android.apps.authenticator2/.main.MainActivity
+  Activity #63:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.google.android.apps.cloudconsole/.common.ExternalMainContainerActivity
+  Activity #64:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.google.android.apps.playconsole/com.google.android.apps.play.console.mobile.MainActivity
+  Activity #65:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.google.chromeremotedesktop/com.google.remoting.androidwrapper.MainActivity
+  Activity #66:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.groundview.service/.SetupActivity
+  Activity #67:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.gsr.gs25/.MainActivity
+  Activity #68:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.handicraft.mylocation/.MainActivity
+  Activity #69:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.hi.pineapple/.activity.SplashActivity
+  Activity #70:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.imsilogcatviewer/.ui.MainActivity
+  Activity #71:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.kmplayer/.SplashActivity
+  Activity #72:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.ktcs.whowho/.atv.main.AtvIntro
+  Activity #73:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lgcns.mdm/.activity.MDMActivity
+  Activity #74:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lgcns.multirecorder/.MainActivity
+  Activity #75:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lgu/.page.LoadingPage
+  Activity #76:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lguplus.aicallagent/.MainActivity
+  Activity #77:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lguplus.alphakey/.view.IntroActivity
+  Activity #78:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lguplus.blocksmishing/.HybridMainActivity
+  Activity #79:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lguplus.callrecorder/.MainActivity
+  Activity #80:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lguplus.gmobile/.Startup
+  Activity #81:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lguplus.idaas/.view.IntroActivity
+  Activity #82:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lguplus.madang.store/.Startup
+  Activity #83:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lguplus.mobile.madang/.Startup
+  Activity #84:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lguplus.nerget/.MainActivity
+  Activity #85:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lguplus.onenumber/.view.IntroActivity
+  Activity #86:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lguplus.remocon/.presentation.activity.MainActivity
+  Activity #87:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lguplus.smartlearning/.SplashActivity
+  Activity #88:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.lguplus.smartotp/.ui.IntroActivity
+  Activity #89:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.linkedin.android/.authenticator.LaunchActivityDefault
+  Activity #90:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.metago.astro/.MainActivity
+  Activity #91:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.mic.set.hce.railpluscardserviceandroid/.ui.HomeActivity
+  Activity #92:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.microsoft.office.officehubrow/com.microsoft.office.officesuite.OfficeSuiteActivity
+  Activity #93:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.microsoft.office.powerpoint/com.microsoft.office.apphost.LaunchActivity
+  Activity #94:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.microsoft.skydrive/.MainActivity
+  Activity #95:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.modoo.callrec/.MainActivity
+  Activity #96:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.musinsa.store/.scenes.deeplink.MujinjangWinter26DeepLinkActivityAlias
+  Activity #97:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.navercorp.android.smartboard/.activity.intro.SplashActivity
+  Activity #98:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.netflix.mediaclient/.ui.launch.UIWebViewActivity
+  Activity #99:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.nhn.android.nmap/com.naver.map.LaunchActivity
+  Activity #100:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.nhn.android.search/.ui.pages.SearchHomePage
+  Activity #101:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.okta.android.auth/.activity.SplashActivity
+  Activity #102:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.openai.chatgpt/.MainActivity
+  Activity #103:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.pdanet/com.foxfi.HotspotSettings
+  Activity #104:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.qabulls.aiprompter/.ui.MainActivity
+  Activity #105:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.qabulls.alms/.MainActivity
+  Activity #106:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.qabulls.appkium/.ui.HubActivity
+  Activity #107:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.qabulls.appkium.harness/.HarnessActivity
+  Activity #108:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.qabulls.attendance.attendance_app/.MainActivity
+  Activity #109:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.qabulls.callerbot.ntv/com.qabulls.callbot.ui.MainActivity
+  Activity #110:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.qabulls.qablog.qa_blog/.MainActivity
+  Activity #111:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.reqable.android/.MainActivity
+  Activity #112:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.sampleapp/.AppIconDefault
+  Activity #113:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.samsung.android.app.watchmanager/.setupwizard.SetupWizardWelcomeActivity
+  Activity #114:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.sci.siren24.ipin/.MainActivity
+  Activity #115:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.sec.android.app.popupcalculator/.Calculator
+  Activity #116:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.sec.android.app.sbrowser.webapk.w1cd7d96fc208683637132ea26e27137b1/org.chromium.webapk.shell_apk.h2o.H2OOpaqueMainActivity
+  Activity #117:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.sec.android.app.voicenote/.main.VNMainActivity
+  Activity #118:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.sec.penup/.ui.SplashActivity
+  Activity #119:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.skplanet.tstore.shopclienttracer/com.skplanet.tstore.sctracer.TracerActivity
+  Activity #120:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.skt.nugu.apollo/com.skt.nugu.visual.splash.SplashActivity
+  Activity #121:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.skt.prod.dialer/.activities.main.MainActivity
+  Activity #122:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.soccer.score.star/com.androidgamegou.androidutils.AndroidUtils
+  Activity #123:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.softwareinlife.docswave/.MainActivity
+  Activity #124:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.teamblind.blind/.ui.launch.activity.LaunchActivity
+  Activity #125:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.the29cm.app29cm/.intro.DefaultAppIconClone
+  Activity #126:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com.wt.apkinfo/.activities.StartActivity
+  Activity #127:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    com0.Company.ProductName1/com.unity3d.player.UnityPlayerActivity
+  Activity #128:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    dev.firebase.appdistribution/.main.MainActivity
+  Activity #129:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    io.appium.settings/.Settings
+  Activity #130:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    io.github.ratul.topactivity/.ui.SettingsActivity
+  Activity #131:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    kr.co.serveone.atxpertbus/.SplashActivity
+  Activity #132:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    kr.co.thecall/.activities.MainActivity
+  Activity #133:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    kr.co.tmoney.tia/.tgo.app.intro.v3.V3IntroActivity
+  Activity #134:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    kr.go.minwon.m/.BrowserActivity
+  Activity #135:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    kr.go.nts.android/.SplashScreenActivity
+  Activity #136:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    kr.or.swai.mobile/.MainActivity
+  Activity #137:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    lgt.call/.Main
+  Activity #138:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    net.daum.android.daum/.DaumActivity
+  Activity #139:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    net.mediaarea.mediainfo/.ReportListActivity
+  Activity #140:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    notion.id/notion.local.id.MainActivity
+  Activity #141:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    oracle.idm.mobile.authenticator/.ui.SplashActivity
+  Activity #142:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    org.chromium.webapk.a645089f9d2819071_v2/org.chromium.webapk.shell_apk.h2o.H2OOpaqueMainActivity
+  Activity #143:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    org.chromium.webapk.a9f39fe03faac447d_v2/org.chromium.webapk.shell_apk.h2o.H2OOpaqueMainActivity
+  Activity #144:
+    priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+    socar.Socar/.LauncherActivity

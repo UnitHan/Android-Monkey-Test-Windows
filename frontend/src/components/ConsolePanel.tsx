@@ -1,4 +1,4 @@
-/** v3 "콘솔 로그" side panel (black console), now fed by the API log store (/api/v1/logs). */
+/** Full workspace console tab, fed by the API log store (/api/v1/logs). */
 import { useEffect, useRef, useState } from "react";
 import { api, type LogRecord } from "../api/client";
 import { Button, LabelFrame } from "./tk";
@@ -12,7 +12,7 @@ function fmt(r: LogRecord): string {
   return `${t} - ${r.level} - [${r.source}] ${r.message}${ids ? ` (${ids})` : ""}${d}`;
 }
 
-export function ConsolePanel(props: { sessionId: string | null; onHide: () => void }) {
+export function ConsolePanel(props: { sessionId: string | null; active: boolean; onBack: () => void }) {
   const [lines, setLines] = useState<LogRecord[]>([]);
   const [sessionOnly, setSessionOnly] = useState(false);
   const [follow, setFollow] = useState(true);
@@ -45,8 +45,8 @@ export function ConsolePanel(props: { sessionId: string | null; onHide: () => vo
   }, [sid]);
 
   useEffect(() => {
-    if (follow && box.current) box.current.scrollTop = box.current.scrollHeight;
-  }, [lines, follow]);
+    if (props.active && follow && box.current) box.current.scrollTop = box.current.scrollHeight;
+  }, [lines, follow, props.active]);
 
   return (
     <div className="console">
@@ -58,12 +58,15 @@ export function ConsolePanel(props: { sessionId: string | null; onHide: () => vo
           <Button onClick={() => setLines([])}>지우기</Button>
           <Button onClick={() => { setFollow(true); box.current?.scrollTo(0, box.current.scrollHeight); }}>맨 아래로</Button>
           <span className="grow" />
-          <Button onClick={props.onHide}>숨기기</Button>
+          <Button onClick={props.onBack}>메인 패널로</Button>
         </div>
         <div
           ref={box}
           className="console-text"
+          tabIndex={0}
+          aria-label="콘솔 로그 내용"
           onScroll={(e) => {
+            if (!props.active) return;
             const el = e.currentTarget;
             setFollow(el.scrollHeight - el.scrollTop - el.clientHeight < 30);
           }}

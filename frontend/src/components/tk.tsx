@@ -83,7 +83,7 @@ export function Toplevel(props: {
           <span>{props.title}</span>
           {props.onClose && <button aria-label="닫기" onClick={props.onClose}>×</button>}
         </div>
-        <div className="tk-body col">{props.children}</div>
+        <div className="tk-body col" tabIndex={0}>{props.children}</div>
       </div>
     </div>
   );

@@ -21,11 +21,14 @@ def settings(tmp_path: Path) -> Settings:
     return Settings(
         adb_path="adb-fake",
         data_dir=tmp_path / "data",
+        export_dir=tmp_path / "exports",
         log_level="WARNING",
         app_launch_wait_s=0,
         perf_interval_s=0.02,
         guard_interval_s=0.02,
         gemini_api_key=None,
+        play_oauth_file=tmp_path / "play-oauth.json",
+        play_packages=["com.lguplus.aicallagent"],
     )
 
 
@@ -44,7 +47,7 @@ def api(
     settings: Settings, adb: FakeAdb, log_store: LogStore, request: pytest.FixtureRequest
 ) -> Iterator[ContractClient]:
     app = create_app(settings, adb=adb, log_store=log_store, advisor=NoAdvisor())
-    with TestClient(app) as client:
+    with TestClient(app, base_url="http://127.0.0.1", client=("127.0.0.1", 50000)) as client:
         contract = ContractClient(client, log_store)
         request.node.contract_client = contract
         yield contract

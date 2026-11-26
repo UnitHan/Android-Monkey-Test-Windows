@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from monkey_api.adapters.adb import parsers
+from monkey_api.adapters.adb.monkey_process import start_monkey
 from monkey_api.adapters.adb.runner import AdbPort, AdbStream, run_checked
 from monkey_api.core.errors import AdbError, DeviceNotFound
 from monkey_api.core.logging import log
@@ -14,7 +15,7 @@ _PACKAGE_LIST_VARIANTS: tuple[tuple[str, ...], ...] = (
     ("--user", "0"),
     ("--user", "current"),
 )
-_LAUNCHER = ("-c", "android.intent.category.LAUNCHER", "1")
+_LAUNCHER = ("-a", "android.intent.action.MAIN", "-c", "android.intent.category.LAUNCHER")
 
 
 class DeviceOps:
@@ -125,7 +126,16 @@ class DeviceOps:
         await run_checked(self.adb, ["shell", "am", "force-stop", package], serial=serial)
 
     async def launch(self, serial: str, package: str) -> None:
-        await run_checked(self.adb, ["shell", "monkey", "-p", package, *_LAUNCHER], serial=serial)
+        # A second Monkey replaces the running test's global ActivityController.
+        resolve = ["shell", "cmd", "package", "resolve-activity", "--brief", "--user", "current", *_LAUNCHER, package]
+        resolved = await run_checked(self.adb, resolve, serial=serial)
+        component = parsers.parse_launcher_component(resolved, package)
+        if component is None:
+            raise AdbError("launcher activity could not be resolved", package=package)
+        args = ["shell", "am", "start", "--user", "current", *_LAUNCHER, "-f", "0x10200000", "-n", component]
+        out = await run_checked(self.adb, args, serial=serial)
+        if "Error:" in out or "Exception" in out:
+            raise AdbError("launcher activity could not be started", package=package)
 
     async def pid_of(self, serial: str, package: str) -> int | None:
         result = await self.adb.run(["shell", "pidof", package], serial=serial, timeout=8, quiet=True)
@@ -179,5 +189,21 @@ class DeviceOps:
     async def logcat(self, serial: str) -> AdbStream:
         return await self.adb.stream(["logcat", "-v", "threadtime"], serial=serial)
 
-    async def monkey(self, serial: str, args: list[str]) -> AdbStream:
+    async def foreground_events(self, serial: str) -> AdbStream:
+        args = [
+            "logcat",
+            "-b",
+            "events",
+            "-v",
+            "brief",
+            "-T",
+            "1",
+            "wm_set_resumed_activity:I",
+            "wm_resume_activity:I",
+            "am_resume_activity:I",
+            "*:S",
+        ]
         return await self.adb.stream(args, serial=serial)
+
+    async def monkey(self, serial: str, args: list[str]) -> AdbStream:
+        return await start_monkey(self.adb, serial, args)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 from monkey_api.core.logging import LogLevel, LogSource
 from monkey_api.domain.models import (
@@ -14,6 +14,8 @@ from monkey_api.domain.models import (
     PackageItem,
     PerfSample,
     Preset,
+    Progress,
+    RunResult,
     Session,
     SessionEvent,
 )
@@ -35,6 +37,33 @@ class Health(BaseModel):
     version: str
     adb: AdbStatus
     ai_advisor: bool
+
+
+class AiSettingsOut(BaseModel):
+    configured: bool = Field(description="A non-empty key was loaded; does not imply a successful API call")
+    enabled: bool
+    model: str
+    config_file: str
+    restart_required: bool = False
+    usage: Literal["next_run_event_suggestion"] = "next_run_event_suggestion"
+
+
+class AiSettingsIn(In):
+    api_key: SecretStr = Field(min_length=1, max_length=512)
+    model: str = Field(default="gemini-3.5-flash-lite", min_length=1, max_length=100, pattern=r"^[A-Za-z0-9._-]+$")
+
+
+class SessionTimingOut(BaseModel):
+    session_id: str
+    mode: Literal["time", "events"]
+    time_basis: Literal["monotonic_wall_time"] = "monotonic_wall_time"
+    completion_policy: Literal["extend_until_deadline", "event_count"]
+    target_per_run_s: float | None
+    target_total_s: float | None = Field(description="Execution only; excludes preparation, cleanup and AI wait")
+    completed_execution_s: float | None = Field(description="Null if historical runs have no separate execution timing")
+    extension_count: int
+    progress: Progress
+    runs: list[RunResult]
 
 
 class DeviceList(BaseModel):
@@ -76,10 +105,12 @@ class PresetList(BaseModel):
 
 
 class EstimateIn(In):
-    events: int = Field(gt=0)
+    events: int | None = Field(
+        default=None, gt=0, le=1_000_000, description="required unless target_minutes_per_run is set"
+    )
     repeats: int = Field(gt=0, le=100)
     throttle_ms: int = Field(ge=0, le=10_000)
-    target_minutes_per_run: float | None = Field(default=None, gt=0)
+    target_minutes_per_run: float | None = Field(default=None, gt=0, le=240)
 
 
 class SessionCreateIn(In):
@@ -91,6 +122,11 @@ class SessionCreateIn(In):
 
 class SessionList(BaseModel):
     items: list[Session]
+
+
+class ReportExportOut(BaseModel):
+    path: str
+    filename: str
 
 
 class EventList(BaseModel):

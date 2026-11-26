@@ -49,16 +49,23 @@ def test_full_lifecycle_detects_crash_and_builds_report(api: ContractClient, adb
 
     issues = api.get(f"/sessions/{s['id']}/issues").json()["items"]
     assert issues[0]["kind"] == "crash" and "NullPointerException" in issues[0]["summary"]
-    assert api.get(f"/sessions/{s['id']}/perf").json()["items"][0]["memory_mb"] == 180.0
+    samples = api.get(f"/sessions/{s['id']}/perf").json()["items"]
+    assert samples[0]["source"] == "appkium" and samples[0]["memory_mb"] is None
+    assert any(p["memory_mb"] is not None and p["memory_mb"] > 0 for p in samples)
     report = api.get(f"/sessions/{s['id']}/report").json()
     assert report["total_events_sent"] == 600 and any("크래시" in x for x in report["suggestions"])
+    assert report["perf"]["memory_mb"]["p90"] is not None
+    assert all(f["status"] == "insufficient" for f in report["resource_assessment"]["findings"])
     html = api.get(f"/sessions/{s['id']}/report.html")
     assert html.status_code == 200 and "NullPointerException" in html.text
+    assert "P90" in html.text and "표준편차" in html.text and "판단 보류" in html.text
     xlsx = api.get(f"/sessions/{s['id']}/report.xlsx")
     assert xlsx.status_code == 200 and xlsx.content[:2] == b"PK"
     logcat = api.get(f"/sessions/{s['id']}/logcat/1")
     assert "FATAL EXCEPTION" in logcat.text and "\\n" not in logcat.text  # legacy wrote literal \n
 
+    # event-based run: monkey gets exactly the configured events (no time-box headroom)
+    assert all(args[-1] == "300" for args, _ in adb.calls if args[:2] == ("shell", "monkey") and "--throttle" in args)
     # monkey was called with argument lists (never shell strings) on the right serial
     monkey_calls = [args for args, serial in adb.calls if args[:2] == ("shell", "monkey") and serial == SERIAL]
     assert any("--throttle" in a for a in monkey_calls)
@@ -135,7 +142,8 @@ def test_monkey_failed_to_start_is_logged_with_stderr(api: ContractClient, adb: 
 def test_guard_relaunches_app_when_it_leaves_foreground(api: ContractClient, adb: FakeAdb) -> None:
     other = fixture("activity_activities.txt").replace("com.example.app", "com.android.launcher")
     adb.on("shell", "dumpsys", "activity", "activities", reply=other)
-    adb.on_stream("shell", "monkey", factory=lambda: FakeStream(["    // Sending event #1"] * 30, delay_s=0.02))
+    lines = ["    // Sending event #1"] * 30 + ["Events injected: 300", "// Monkey finished"]
+    adb.on_stream("shell", "monkey", factory=lambda: FakeStream(lines, delay_s=0.02))
     s = create(api, repeats=1)
     api.post(f"/sessions/{s['id']}/start")
     api.wait_state(s["id"], {"completed"})
@@ -172,7 +180,7 @@ def test_delete_rules(api: ContractClient, adb: FakeAdb) -> None:
 def test_adaptive_events_grow_toward_target(api: ContractClient, adb: FakeAdb) -> None:
     lines = [f"    // Sending event #{n}" for n in range(100, 301, 100)] + ["Events injected: 300"]
     adb.on_stream("shell", "monkey", factory=lambda: FakeStream(lines, delay_s=0.01))
-    s = create(api, preset="smoke", repeats=2, target_minutes_per_run=1)
+    s = create(api, preset="smoke", repeats=2, target_minutes_per_run=0.005)
     api.post(f"/sessions/{s['id']}/start")
     final = api.wait_state(s["id"], {"completed"})
     first, second = final["runs"]
@@ -210,3 +218,20 @@ def test_package_not_installed_adb_failure_on_start(api: ContractClient, adb: Fa
     api.post(f"/sessions/{s['id']}/start")
     final = api.wait_state(s["id"], {"failed"})
     assert final["error"] == "error: device offline"
+
+
+def test_time_boxed_run_launches_monkey_with_headroom(api: ContractClient, adb: FakeAdb) -> None:
+    adb.on_stream("shell", "monkey", factory=lambda: FakeStream(["    // Sending event #100"], hold=True))
+    s = create(api, repeats=1, target_minutes_per_run=0.005)
+    api.post(f"/sessions/{s['id']}/start")
+    final = api.wait_state(s["id"], {"completed", "failed"})
+    assert final["runs"][0]["end_reason"] == "time_limit" and final["runs"][0]["events_target"] == 300
+    budgets = [args[-1] for args, _ in adb.calls if args[:2] == ("shell", "monkey") and "--throttle" in args]
+    assert budgets == ["390"]  # ceil(300 * 1.3)
+
+
+def test_estimate_accepts_time_only_and_rejects_empty(api: ContractClient) -> None:
+    est = api.post("/estimates", json={"repeats": 5, "throttle_ms": 250, "target_minutes_per_run": 7}).json()
+    assert est["mode"] == "time" and est["per_run_events"] == 4667 and est["total_s"] == 420 * 5 + 12 * 5 + 5
+    bad = api.post("/estimates", json={"repeats": 5, "throttle_ms": 250})
+    assert bad.status_code == 422 and bad.json()["code"] == "validation_failed"

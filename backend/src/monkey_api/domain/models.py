@@ -39,7 +39,7 @@ class DeviceInfo(Model):
 
 class PackageItem(Model):
     name: str
-    display_name: str
+    display_name: str = Field(description="Android label in the device locale; package identifier if lookup fails")
 
 
 class PackageVersion(Model):
@@ -89,12 +89,20 @@ class Preset(Model):
 
 
 class SessionOverrides(Model):
-    events: int | None = Field(default=None, gt=0)
+    events: int | None = Field(
+        default=None,
+        gt=0,
+        le=1_000_000,
+        description="Fixed count in event mode; initial estimate in time mode (automatically extended on exhaustion)",
+    )
     repeats: int | None = Field(default=None, gt=0, le=100)
     throttle_ms: int | None = Field(default=None, ge=0, le=10_000)
     seed: int | None = Field(default=None, ge=0)
-    target_minutes_per_run: float | None = Field(default=None, gt=0)
-    adaptive: bool | None = None
+    target_minutes_per_run: float | None = Field(default=None, gt=0, le=240)
+    adaptive: bool | None = Field(
+        default=None,
+        description="Next-run rate/Gemini suggestion; false does not disable extension within a time-based run",
+    )
 
 
 class SessionConfig(Model):
@@ -135,6 +143,10 @@ class Progress(Model):
     events_sent: int = 0
     events_target: int = 0
     elapsed_s: float = 0.0
+    target_duration_s: float | None = None
+    remaining_s: float | None = None
+    segment: int = 0
+    events_budget: int = 0
 
 
 class IssueCounts(Model):
@@ -157,6 +169,29 @@ class PerfSample(Model):
     run: int
     memory_mb: float | None
     cpu_percent: float | None
+    source: Literal["adb", "appkium"] = "adb"
+    cpu_total_percent: float | None = None
+    cpu_cores: int | None = None
+    rss_mb: float | None = None
+    fps: float | None = None
+    jank_count: int | None = None
+    frame_time_max_ms: float | None = None
+    threads: int | None = None
+    running: bool | None = None
+    foreground: bool | None = None
+    battery_temp_c: float | None = None
+    device_cpu_percent: float | None = None
+    sample_cost_ms: float | None = None
+
+
+class RunSegment(Model):
+    segment: int
+    seed: int
+    events_budget: int
+    events_sent: int
+    duration_s: float
+    end_reason: RunEndReason
+    exit_code: int | None
 
 
 class RunResult(Model):
@@ -170,6 +205,11 @@ class RunResult(Model):
     duration_s: float
     exit_code: int | None
     end_reason: RunEndReason
+    target_duration_s: float | None = None
+    execution_duration_s: float | None = None
+    preparation_duration_s: float | None = None
+    cleanup_duration_s: float | None = None
+    segments: list[RunSegment] = Field(default_factory=list)
     crashes: int = 0
     anrs: int = 0
     mem_peak_mb: float | None = None
@@ -194,6 +234,9 @@ class Session(Model):
 
 class SessionEvent(Model):
     seq: int
-    type: str = Field(description="state_changed | progress | run_started | run_finished | issue | perf | log")
+    type: str = Field(
+        description="state_changed | progress | run_started | run_finished | run_extended | "
+        "segment_started | segment_finished | issue | perf | log"
+    )
     at: datetime
     data: dict[str, Any]

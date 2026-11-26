@@ -1,7 +1,20 @@
 import { QueryClient } from "@tanstack/react-query";
-import { describe, expect, it } from "vitest";
-import type { PerfSample, Session, SessionEvent } from "./client";
-import { applySessionEvent, keys } from "./hooks";
+import { describe, expect, it, vi } from "vitest";
+import { api, type PerfSample, type Session, type SessionEvent } from "./client";
+import { applySessionEvent, keys, refreshAppInfo } from "./hooks";
+
+it("refreshes selected device packages, installed version and Play metadata together", async () => {
+  const qc = new QueryClient();
+  const refresh = vi.spyOn(api, "packages").mockResolvedValue({items: [], total: 0});
+  const selected = [keys.packages("s1", "", false), keys.version("s1", "app"), keys.play("app"), keys.icon("s1", "app")];
+  const other = keys.version("s2", "app");
+  for (const key of [...selected, other]) qc.setQueryData(key, {});
+  await refreshAppInfo(qc, "s1", "app");
+  expect(refresh).toHaveBeenCalledWith("s1", "", false, true);
+  refresh.mockRestore();
+  for (const key of selected) expect(qc.getQueryState(key)?.isInvalidated).toBe(true);
+  expect(qc.getQueryState(other)?.isInvalidated).toBe(false);
+});
 
 const ev = (seq: number, type: string, data: Record<string, unknown> = {}): SessionEvent => ({
   seq, type, at: "2026-11-26T00:00:00Z", data,

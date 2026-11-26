@@ -1,0 +1,6 @@
+    resource 0x7f060075 color/ic_launcher_background
+      () #ffffffff
+    resource 0x7f0f0000 mipmap/ic_launcher
+      (anydpi) (file) res/E4.xml type=XML
+    resource 0x7f0f0001 mipmap/ic_launcher_foreground
+      (xxxhdpi) (file) res/as.png type=PNG

@@ -11,10 +11,12 @@ from monkey_api.adapters.adb.device_ops import DeviceOps
 from monkey_api.adapters.ai.advisor import TuningAdvisor
 from monkey_api.adapters.report.excel import write_excel
 from monkey_api.adapters.report.html import write_html
+from monkey_api.adapters.storage.performance_analysis import read_analysis
 from monkey_api.core.errors import AppError
 from monkey_api.core.logging import log, session_id_var
 from monkey_api.core.settings import Settings
 from monkey_api.domain.adaptive import RunSample, next_run_events
+from monkey_api.domain.ai_evidence import evidence_for, evidence_hash
 from monkey_api.domain.estimation import estimate_duration
 from monkey_api.domain.models import RunResult, Session, SessionState
 from monkey_api.domain.monkey_command import seed_for_run
@@ -35,7 +37,9 @@ class RunnerDeps:
 
 def build_session_report(ledger: SessionLedger, session_id: str) -> SessionReport:
     repo = ledger.repo
-    return build_report(repo.get(session_id), repo.issues(session_id), repo.perf(session_id))
+    report = build_report(repo.get(session_id), repo.issues(session_id), repo.perf(session_id))
+    report.ai_performance = read_analysis(repo.dir_for(session_id), evidence_hash(evidence_for(report)))
+    return report
 
 
 class SessionRunner:
@@ -96,15 +100,27 @@ class SessionRunner:
             if stop.is_set():
                 break
             events = await self._events_for(
-                cfg.events, history, cfg.target_minutes_per_run, cfg.adaptive, cfg.adaptive_margin, cfg.throttle_ms
+                cfg.events,
+                history,
+                cfg.target_minutes_per_run,
+                cfg.adaptive,
+                cfg.adaptive_margin,
+                cfg.throttle_ms,
+                stop,
             )
+            if stop.is_set():
+                break
             seed = seed_for_run(cfg)
             ledger.emit(session_id, "run_started", {"run": run, "events": events, "seed": seed})
             result = await execute_run(ctx, run, events, seed)
             self._append_run(session_id, result)
+            if result.end_reason in ("failed_to_start", "aborted"):
+                self._write_reports(session_id)
+                raise AppError(f"monkey {result.end_reason} during run {run}")
             if result.end_reason == "device_lost" and not await self.deps.ops.reconnect(cfg.device_serial):
                 raise AppError(f"device {cfg.device_serial} lost during run {run}")
-            history.append(RunSample(result.events_sent, result.duration_s))
+            if result.end_reason in ("completed", "time_limit"):
+                history.append(RunSample(result.events_sent, result.execution_duration_s or result.duration_s))
             if run < cfg.repeats:
                 with contextlib.suppress(TimeoutError):
                     await asyncio.wait_for(stop.wait(), _BETWEEN_RUNS_S)
@@ -117,17 +133,36 @@ class SessionRunner:
         adaptive: bool,
         margin: float,
         throttle_ms: int,
+        stop: asyncio.Event,
     ) -> int:
         if not adaptive or target_min is None or not history:
             return base
         target_s = target_min * 60
         algo = next_run_events(base, history, target_s, margin)
-        suggested = await self.deps.advisor.suggest_events(base, history, target_s, throttle_ms)
+        suggested = await self._suggest_until_stopped(base, history, target_s, throttle_ms, stop)
         if suggested is None:
             return algo
         bounded = max(base, min(int(base * (1 + margin)), suggested))
         log("session", "advisor suggestion applied", algorithm=algo, advisor=suggested, applied=bounded)
         return bounded
+
+    async def _suggest_until_stopped(
+        self, base: int, history: list[RunSample], target_s: float, throttle_ms: int, stop: asyncio.Event
+    ) -> int | None:
+        advice = asyncio.create_task(self.deps.advisor.suggest_events(base, history, target_s, throttle_ms))
+        cancelled = asyncio.create_task(stop.wait())
+        try:
+            done, _ = await asyncio.wait({advice, cancelled}, timeout=20, return_when=asyncio.FIRST_COMPLETED)
+            if stop.is_set():
+                return None
+            if advice in done:
+                return advice.result()
+            log("session", "advisor deadline reached, using algorithm", "WARNING")
+            return None
+        finally:
+            advice.cancel()
+            cancelled.cancel()
+            await asyncio.gather(advice, cancelled, return_exceptions=True)
 
     def _append_run(self, session_id: str, result: RunResult) -> None:
         def add(s: Session) -> Session:

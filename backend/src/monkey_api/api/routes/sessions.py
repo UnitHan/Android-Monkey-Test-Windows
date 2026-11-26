@@ -12,12 +12,23 @@ from monkey_api.adapters.report.excel import write_excel
 from monkey_api.adapters.report.html import write_html
 from monkey_api.api.container import Container, get_container
 from monkey_api.api.errors import problem_responses
-from monkey_api.api.schemas import EventList, IssueList, PerfList, SessionCreateIn, SessionList
+from monkey_api.api.schemas import (
+    EventList,
+    IssueList,
+    PerfList,
+    ReportExportOut,
+    SessionCreateIn,
+    SessionList,
+    SessionTimingOut,
+)
 from monkey_api.core.errors import NotFound
+from monkey_api.domain.ai_evidence import AnalysisPreview
+from monkey_api.domain.ai_performance import AnalysisRequest, PerformanceAnalysis
 from monkey_api.domain.models import Session, SessionEvent
 from monkey_api.domain.report import SessionReport
 from monkey_api.domain.state_machine import TERMINAL_STATES
 from monkey_api.services.event_bus import EventBus
+from monkey_api.services.report_export import export_excel
 from monkey_api.services.session_runner import build_session_report
 from monkey_api.services.session_service import resolve_config
 
@@ -42,6 +53,32 @@ async def create_session(body: SessionCreateIn, c: Container = Depends(get_conta
 @router.get("/{session_id}", response_model=Session, responses=_NF)
 async def get_session(session_id: str = SessionId, c: Container = Depends(get_container)) -> Session:
     return c.ledger.get(session_id)
+
+
+@router.get("/{session_id}/timing", response_model=SessionTimingOut, responses=_NF)
+async def get_timing(session_id: str = SessionId, c: Container = Depends(get_container)) -> SessionTimingOut:
+    """Deadline policy, current progress and measured per-segment execution history."""
+    session = c.ledger.get(session_id)
+    target = session.config.target_minutes_per_run
+    measured = [run.execution_duration_s for run in session.runs]
+    return SessionTimingOut(
+        session_id=session.id,
+        mode="time" if target is not None else "events",
+        completion_policy="extend_until_deadline" if target is not None else "event_count",
+        target_per_run_s=target * 60 if target is not None else None,
+        target_total_s=target * 60 * session.config.repeats if target is not None else None,
+        completed_execution_s=round(sum(v for v in measured if v is not None), 3)
+        if all(v is not None for v in measured)
+        else None,
+        extension_count=sum(max(0, len(r.segments) - 1) for r in session.runs)
+        + (
+            max(0, session.progress.segment - 1)
+            if session.progress.current_run not in {r.run for r in session.runs}
+            else 0
+        ),
+        progress=session.progress,
+        runs=session.runs,
+    )
 
 
 @router.post("/{session_id}/start", response_model=Session, status_code=202, responses=_CMD)
@@ -129,10 +166,31 @@ async def get_report(session_id: str = SessionId, c: Container = Depends(get_con
     return build_session_report(c.ledger, session_id)
 
 
+@router.get("/{session_id}/performance-analysis/preview", response_model=AnalysisPreview, responses=_CMD)
+async def preview_performance_analysis(
+    session_id: str = SessionId,
+    c: Container = Depends(get_container),
+) -> AnalysisPreview:
+    return c.performance_analysis.preview(session_id)
+
+
+@router.post(
+    "/{session_id}/performance-analysis",
+    response_model=PerformanceAnalysis,
+    responses=problem_responses(404, 409, 422, 502, 503, 504),
+)
+async def analyze_performance(
+    body: AnalysisRequest,
+    session_id: str = SessionId,
+    c: Container = Depends(get_container),
+) -> PerformanceAnalysis:
+    return await c.performance_analysis.analyze(session_id, body)
+
+
 @router.get("/{session_id}/report.html", response_class=FileResponse, responses=_NF)
 async def get_report_html(session_id: str = SessionId, c: Container = Depends(get_container)) -> FileResponse:
     path = write_html(build_session_report(c.ledger, session_id), c.ledger.repo.dir_for(session_id) / "report.html")
-    return FileResponse(path, media_type="text/html; charset=utf-8")
+    return FileResponse(path, media_type="text/html; charset=utf-8", headers={"Cache-Control": "no-store"})
 
 
 @router.get("/{session_id}/report.xlsx", response_class=FileResponse, responses=_NF)
@@ -150,3 +208,9 @@ async def get_logcat(
     if not path.exists():
         raise NotFound(f"no logcat for run {run}", run=run)
     return PlainTextResponse(path.read_text(encoding="utf-8", errors="replace"))
+
+
+@router.post("/{session_id}/exports/xlsx", response_model=ReportExportOut, responses=_NF)
+async def export_report_xlsx(session_id: str = SessionId, c: Container = Depends(get_container)) -> ReportExportOut:
+    path = export_excel(c.ledger, session_id, c.settings.export_dir)
+    return ReportExportOut(path=str(path), filename=path.name)

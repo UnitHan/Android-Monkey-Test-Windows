@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import subprocess
 import sys
 import time
@@ -34,6 +35,7 @@ class AdbStream(Protocol):
     def lines(self) -> AsyncIterator[str]: ...
     async def stderr_text(self) -> str: ...
     async def wait(self) -> int: ...
+    async def write_stdin(self, data: bytes) -> None: ...
     async def terminate(self, grace_s: float = 5.0) -> int | None: ...
 
 
@@ -66,30 +68,49 @@ class _ProcessStream:
         self._proc = proc
         self._args = args
         self.pid = proc.pid
+        self._stderr = asyncio.create_task(self._read_stderr())
 
     async def lines(self) -> AsyncIterator[str]:
         assert self._proc.stdout is not None
         async for raw in self._proc.stdout:
             yield raw.decode("utf-8", errors="replace").rstrip("\r\n")
 
-    async def stderr_text(self) -> str:
+    async def _read_stderr(self) -> str:
         assert self._proc.stderr is not None
-        data = await self._proc.stderr.read()
-        return data.decode("utf-8", errors="replace")
+        head = bytearray()
+        while chunk := await self._proc.stderr.read(8192):
+            head.extend(chunk[: max(0, 4096 - len(head))])
+        return head.decode("utf-8", errors="replace")
+
+    async def stderr_text(self) -> str:
+        return await self._stderr
 
     async def wait(self) -> int:
         return await self._proc.wait()
 
+    async def write_stdin(self, data: bytes) -> None:
+        if self._proc.stdin is None:
+            raise AdbError("stream stdin is unavailable")
+        try:
+            self._proc.stdin.write(data)
+            await self._proc.stdin.drain()
+        except (BrokenPipeError, ConnectionResetError) as exc:
+            raise AdbError("stream stdin closed") from exc
+
     async def terminate(self, grace_s: float = 5.0) -> int | None:
-        if self._proc.returncode is not None:
-            return self._proc.returncode
-        self._proc.terminate()
+        if self._proc.stdin is not None:
+            self._proc.stdin.close()
+        if self._proc.returncode is None:
+            with contextlib.suppress(ProcessLookupError):
+                self._proc.terminate()
         try:
             return await asyncio.wait_for(self._proc.wait(), grace_s)
         except TimeoutError:
             self._proc.kill()
             log("adb", "stream killed after grace period", "WARNING", args=list(self._args))
             return await self._proc.wait()
+        finally:
+            await self._stderr
 
 
 class AdbRunner:
@@ -127,7 +148,11 @@ class AdbRunner:
         full = _full_args(self.adb_path, args, serial)
         try:
             proc = await asyncio.create_subprocess_exec(
-                *full, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, creationflags=_NO_WINDOW
+                *full,
+                stdin=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                creationflags=_NO_WINDOW,
             )
         except FileNotFoundError as exc:
             raise AdbUnavailable(f"adb not found at '{self.adb_path}'") from exc

@@ -9,7 +9,8 @@ from monkey_api.domain.models import EventMix, SessionConfig
 _BASE_FLAGS = (
     "--ignore-crashes",
     "--ignore-security-exceptions",
-    "--monitor-native-crashes",
+    # Native crashes are collected from package-filtered logcat. Monkey's tombstone
+    # monitor scans OLD device-wide files and sleeps for each one before injecting.
     "--kill-process-after-error",
 )
 

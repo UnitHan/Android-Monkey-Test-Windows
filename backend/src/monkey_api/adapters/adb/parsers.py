@@ -129,3 +129,12 @@ def parse_setting_flag(output: str) -> bool | None:
     if value in ("0", "false"):
         return False
     return None
+
+
+def parse_launcher_component(output: str, package: str) -> str | None:
+    """`cmd package resolve-activity --brief` → validated explicit launcher component."""
+    for line in output.splitlines():
+        component = line.strip()
+        if re.fullmatch(re.escape(package) + r"/[A-Za-z0-9_.$]+", component):
+            return component
+    return None

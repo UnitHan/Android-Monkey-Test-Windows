@@ -1,7 +1,7 @@
 {
   "name": "monkey-test-ui",
   "private": true,
-  "version": "4.0.0",
+  "version": "4.0.6",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,6 +11,7 @@
     "gen:api": "openapi-typescript ../backend/openapi.json -o src/api/schema.d.ts",
     "check:api": "openapi-typescript ../backend/openapi.json -o src/api/schema.d.ts && git diff --exit-code -- src/api/schema.d.ts",
     "tauri": "tauri",
+    "installer": "..\\backend\\.venv\\Scripts\\python.exe ../scripts/build_installer.py",
     "setup:backend": "python ../backend/scripts/setup_venv.py"
   },
   "dependencies": {

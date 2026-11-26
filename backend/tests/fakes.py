@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import shlex
 from collections.abc import AsyncIterator, Callable, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -53,6 +54,10 @@ class FakeStream:
     async def wait(self) -> int:
         return self.exit_code
 
+    async def write_stdin(self, data: bytes) -> None:
+        if self._terminated.is_set():
+            raise ConnectionResetError("stream terminated")
+
     async def terminate(self, grace_s: float = 5.0) -> int | None:
         self._terminated.set()
         return self.exit_code
@@ -99,6 +104,14 @@ class FakeAdb:
         return AdbResult(key, reply.exit_code, reply.stdout, reply.stderr, reply.duration_ms)
 
     async def stream(self, args: Sequence[str], serial: str | None = None) -> FakeStream:
+        if len(args) == 2 and args[0] == "shell" and args[1].startswith("env CLASSPATH="):
+            args = ["shell", "appkium-agent"]
+        if len(args) == 2 and args[0] == "shell" and args[1].startswith("sh -c "):
+            script = shlex.split(args[1])[2]
+            pid_file = script.split(" > ", 1)[1].split(";", 1)[0]
+            self.on("shell", "cat", pid_file, reply="4242\n")
+            self.on("shell", "cat", "/proc/4242/cmdline", reply=fail("No such file"))
+            args = ["shell", *shlex.split(script.split("; exec ", 1)[1])]
         key = tuple(args)
         self.calls.append((key, serial))
         factory = self._match(self.streams, key)
@@ -129,10 +142,27 @@ def healthy_device() -> FakeAdb:
     adb.on("shell", "dumpsys", "meminfo", reply=fixture("meminfo_android14.txt"))
     adb.on("shell", "dumpsys", "activity", "activities", reply=fixture("activity_activities.txt"))
     adb.on("shell", "pidof", reply="11509\n")
+    adb.on(
+        "shell",
+        "cmd",
+        "package",
+        "resolve-activity",
+        reply=fixture("resolve_ixio_activity.txt").replace("com.lguplus.aicallagent", PACKAGE),
+    )
     adb.on("shell", "top", reply=fixture("top.txt").replace("11509", "11509"))
     adb.on("shell", "settings", "get", "global", "airplane_mode_on", reply="0\n")
     adb.on("shell", "settings", "get", "global", "mobile_data", reply="1\n")
     adb.on_stream("logcat", factory=lambda: FakeStream(fixture("logcat_crash.txt").splitlines(), hold=True))
+    adb.on_stream("logcat", "-b", "events", factory=lambda: FakeStream([], hold=True))
+    adb.on_stream(
+        "shell",
+        "appkium-agent",
+        factory=lambda: FakeStream(
+            fixture("perf_agent.jsonl").replace("com.lguplus.aicallagent", PACKAGE).splitlines(),
+            delay_s=0.01,
+            hold=True,
+        ),
+    )
     adb.on_stream(
         "shell", "monkey",
         factory=lambda: FakeStream(fixture("monkey_output.txt").splitlines(), delay_s=0.01),

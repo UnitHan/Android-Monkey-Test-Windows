@@ -30,6 +30,9 @@ class SessionLedger:
         self.emit(session.id, "state_changed", {"from": None, "to": session.state.value})
         return session
 
+    def delete(self, session_id: str) -> None:
+        self.repo.delete(session_id)
+
     def update(self, session_id: str, mutate: Callable[[Session], Session]) -> Session:
         session = mutate(self.repo.get(session_id))
         self.repo.save(session)

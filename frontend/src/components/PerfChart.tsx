@@ -1,119 +1,68 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import type { PerfSample } from "../api/client";
+import { chartSamples, stats, type Metric } from "./chartData";
 
-const W = 960, H = 230, PAD = { l: 44, r: 12, t: 12, b: 28 };
+const W = 900, H = 250, L = 56, R = 20, T = 18, B = 38;
+const value = (v: number | undefined | null) => v == null ? "—" : v.toLocaleString("ko-KR", { maximumFractionDigits: 1 });
+const time = (s: string) => new Date(s).toLocaleTimeString("ko-KR", { hour12: false });
 
-function niceMax(v: number): number {
-  if (v <= 0) return 1;
-  const p = 10 ** Math.floor(Math.log10(v));
-  return [1, 2, 2.5, 5, 10].map((m) => m * p).find((c) => c >= v) ?? v;
-}
-
-/** Single-series line chart (one measure per chart: never a dual axis). Crosshair + tooltip, table view. */
 export function PerfChart(props: {
-  samples: PerfSample[];
-  metric: "memory_mb" | "cpu_percent";
-  title: string;
-  unit: string;
-  color: string;
-  fixedMax?: number;
+  samples: PerfSample[]; metric: Metric; title: string; unit: string; color: string; fixedMax?: number;
 }) {
-  const { samples, metric } = props;
   const [hover, setHover] = useState<number | null>(null);
   const [table, setTable] = useState(false);
-  const svgRef = useRef<SVGSVGElement>(null);
-
-  const values = samples.map((s) => s[metric] ?? null);
-  const max = props.fixedMax ?? niceMax(Math.max(0, ...values.map((v) => v ?? 0)) * 1.1);
-  const n = samples.length;
-  const x = (i: number) => PAD.l + (n <= 1 ? 0 : (i / (n - 1)) * (W - PAD.l - PAD.r));
-  const y = (v: number) => PAD.t + (1 - v / max) * (H - PAD.t - PAD.b);
-
-  const path = useMemo(() => {
-    let d = "", pen = false;
-    values.forEach((v, i) => {
-      if (v == null) { pen = false; return; }
-      d += `${pen ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`;
-      pen = true;
-    });
-    return d;
-  }, [samples, max]);
-
-  const onMove = (e: React.PointerEvent<SVGSVGElement>) => {
-    const box = svgRef.current?.getBoundingClientRect();
-    if (!box || n === 0) return;
-    const px = ((e.clientX - box.left) / box.width) * W;
-    const i = Math.round(((px - PAD.l) / (W - PAD.l - PAD.r)) * (n - 1));
-    setHover(Math.max(0, Math.min(n - 1, i)));
-  };
-
-  const latest = [...values].reverse().find((v) => v != null);
-  const ticks = [0, max / 2, max];
-  const hv = hover != null ? values[hover] : null;
-
-  return (
-    <figure className="chart" style={{ margin: 0 }}>
-      <figcaption className="row">
-        <b>{props.title}</b>
-        <span className="c-gray small">현재 {latest != null ? `${latest.toFixed(1)} ${props.unit}` : "-"}</span>
-        <button type="button" className="tk-btn" style={{ marginLeft: "auto" }} onClick={() => setTable((t) => !t)} aria-pressed={table}>
-          {table ? "차트" : "표"}
-        </button>
-      </figcaption>
-      {table ? (
-        <div className="tk-tree" style={{ maxHeight: 260 }}>
-          <table>
-            <thead><tr><th>시각</th><th>회차</th><th>{props.title}</th></tr></thead>
-            <tbody>
-              {samples.slice(-300).map((s, i) => (
-                <tr key={i}><td>{new Date(s.at).toLocaleTimeString()}</td><td>{s.run}</td><td>{s[metric] ?? "-"}</td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : n === 0 ? (
-        <p className="c-gray small">아직 데이터가 없습니다.</p>
-      ) : (
-        <>
-          <svg
-            ref={svgRef}
-            viewBox={`0 0 ${W} ${H}`}
-            role="img"
-            aria-label={`${props.title} 추이, 최신 ${latest ?? "-"} ${props.unit}`}
-            onPointerMove={onMove}
-            onPointerLeave={() => setHover(null)}
-          >
-            {ticks.map((t) => (
-              <g key={t}>
-                <line x1={PAD.l} x2={W - PAD.r} y1={y(t)} y2={y(t)} stroke="#e7e7e7" strokeWidth={1} />
-                <text x={PAD.l - 6} y={y(t) + 5} textAnchor="end" fontSize="15" fill="#666666">
-                  {Math.round(t)}
-                </text>
-              </g>
-            ))}
-            <line x1={PAD.l} x2={W - PAD.r} y1={y(0)} y2={y(0)} stroke="#c2c2c2" strokeWidth={1} />
-            <text x={PAD.l} y={H - 8} fontSize="15" fill="#666666">{new Date(samples[0].at).toLocaleTimeString()}</text>
-            <text x={W - PAD.r} y={H - 8} fontSize="15" fill="#666666" textAnchor="end">
-              {new Date(samples[n - 1].at).toLocaleTimeString()}
-            </text>
-            <path d={path} fill="none" stroke={props.color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-            {hover != null && (
-              <g>
-                <line x1={x(hover)} x2={x(hover)} y1={PAD.t} y2={y(0)} stroke="#c2c2c2" strokeWidth={1} />
-                {hv != null && <circle cx={x(hover)} cy={y(hv)} r={4} fill={props.color} stroke="#ffffff" strokeWidth={2} />}
-              </g>
-            )}
-          </svg>
-          {hover != null && (
-            <div className="tooltip" style={{ left: `${(x(hover) / W) * 100}%`, top: 24, transform: "translateX(-50%)" }}>
-              <b>{hv != null ? `${hv.toFixed(1)} ${props.unit}` : "-"}</b>{" "}
-              <span className="c-gray">
-                {new Date(samples[hover].at).toLocaleTimeString()} · {samples[hover].run}회차
-              </span>
-            </div>
-          )}
-        </>
-      )}
-    </figure>
-  );
+  const samples = useMemo(() => chartSamples(props.samples, props.metric), [props.samples, props.metric]);
+  const summary = useMemo(() => stats(props.samples, props.metric), [props.samples, props.metric]);
+  const peak = summary.peak ?? 0;
+  const max = Math.max(props.fixedMax ?? 1, Math.ceil(peak * 1.15 / 5) * 5);
+  const first = samples.length ? Date.parse(samples[0].at) : 0;
+  const span = Math.max(1, samples.length ? Date.parse(samples[samples.length - 1].at) - first : 1);
+  const x = (s: PerfSample) => L + (Date.parse(s.at) - first) / span * (W - L - R);
+  const y = (v: number) => T + (1 - v / max) * (H - T - B);
+  let drawing = false, previous: PerfSample | undefined;
+  const path = samples.map(s => {
+    const v = s[props.metric];
+    if (v == null) { drawing = false; previous = s; return ""; }
+    if (previous && (previous.run !== s.run || Date.parse(s.at) - Date.parse(previous.at) > 15000)) drawing = false;
+    const part = `${drawing ? "L" : "M"}${x(s).toFixed(1)},${y(v).toFixed(1)}`;
+    drawing = true; previous = s; return part;
+  }).join(" ");
+  const point = hover == null ? undefined : samples[Math.min(hover, samples.length - 1)];
+  return <figure className="metric-chart">
+    <figcaption><div><span className="chart-dot" style={{ background: props.color }} /><strong>{props.title}</strong>
+      <span className="metric-unit">{props.unit}</span></div>
+      <button className="chart-toggle" onClick={() => setTable(!table)} aria-pressed={table}>{table ? "그래프" : "데이터"}</button></figcaption>
+    <div className="chart-statistics"><b>{value(summary.latest)} <small>{props.unit}</small></b>
+      <span>평균 <strong>{value(summary.mean)}</strong></span><span>최대 <strong>{value(summary.peak)}</strong></span>
+      <span>P95 <strong>{value(summary.p95)}</strong></span></div>
+    {!samples.length ? <div className="chart-empty">측정 데이터 대기 중</div> : table ? <div className="chart-table">
+      <table><thead><tr><th>시각</th><th>회차</th><th>{props.title} ({props.unit})</th></tr></thead>
+        <tbody>{props.samples.slice(-300).map((s, i) => <tr key={i}><td>{time(s.at)}</td><td>{s.run}</td><td>{value(s[props.metric])}</td></tr>)}</tbody></table>
+      <p>최근 300개 표본 · 전체 값은 엑셀 보고서에서 확인하세요.</p></div> : <>
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" tabIndex={0} aria-label={`${props.title}, 최대 ${value(summary.peak)} ${props.unit}`}
+        onPointerLeave={() => setHover(null)} onKeyDown={e => {
+          if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+            e.preventDefault(); setHover(i => Math.max(0, Math.min(samples.length - 1, (i ?? samples.length - 1) + (e.key === "ArrowLeft" ? -1 : 1))));
+          }
+        }} onPointerMove={e => {
+          const box = e.currentTarget.getBoundingClientRect();
+          const target = first + Math.max(0, Math.min(1, ((e.clientX - box.left) / box.width * W - L) / (W - L - R))) * span;
+          let best = 0;
+          for (let i = 1; i < samples.length; i++) if (Math.abs(Date.parse(samples[i].at) - target) < Math.abs(Date.parse(samples[best].at) - target)) best = i;
+          setHover(best);
+        }}>
+        {[0, .25, .5, .75, 1].map(t => <g key={t}><line x1={L} x2={W - R} y1={y(t * max)} y2={y(t * max)} stroke="#e9eef5" />
+          <text x={L - 10} y={y(t * max) + 5} textAnchor="end" fill="#718096" fontSize="17">{value(t * max)}</text></g>)}
+        {[0, .25, .5, .75, 1].map(t => <text key={t} x={L + t * (W - L - R)} y={H - 10} textAnchor={t === 0 ? "start" : t === 1 ? "end" : "middle"} fill="#718096" fontSize="15">
+          {time(new Date(first + t * span).toISOString())}</text>)}
+        {samples.filter((s, i) => i > 0 && s.run !== samples[i - 1].run).map(s => <g key={s.at}>
+          <line x1={x(s)} x2={x(s)} y1={T} y2={H - B} stroke="#b9c6d8" strokeDasharray="4 4" />
+          <text x={x(s) + 4} y={T + 10} fill="#718096" fontSize="11">{s.run}회차</text></g>)}
+        <path d={path} stroke={props.color} strokeWidth="2" fill="none" strokeLinejoin="round" />
+        {point && <g><line x1={x(point)} x2={x(point)} y1={T} y2={H - B} stroke="#97a6bb" strokeDasharray="3 3" />
+          {point[props.metric] != null && <circle cx={x(point)} cy={y(point[props.metric]!)} r="4" fill={props.color} stroke="white" strokeWidth="2" />}</g>}
+      </svg>
+      <div className="chart-hover">{point ? `${time(point.at)} · ${point.run}회차 · ${value(point[props.metric])} ${props.unit}` : "마우스를 올리거나 ← → 키로 시점별 값을 확인하세요."}</div>
+    </>}
+  </figure>;
 }

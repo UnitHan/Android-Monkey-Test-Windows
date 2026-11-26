@@ -1,0 +1,9 @@
+{
+  "bundle": {
+    "resources": { "runtime/monkey-backend/": "runtime/monkey-backend/" },
+    "windows": {
+      "webviewInstallMode": { "type": "offlineInstaller", "silent": true },
+      "nsis": { "installMode": "currentUser", "languages": ["Korean", "English"], "displayLanguageSelector": true }
+    }
+  }
+}

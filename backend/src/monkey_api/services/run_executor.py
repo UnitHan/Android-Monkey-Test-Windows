@@ -3,26 +3,21 @@
 from __future__ import annotations
 
 import asyncio
-import contextlib
 import time
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 
 from monkey_api.adapters.adb.device_ops import DeviceOps
-from monkey_api.adapters.adb.runner import AdbStream
 from monkey_api.core.ids import utc_now
 from monkey_api.core.logging import log
 from monkey_api.core.settings import Settings
 from monkey_api.domain.analysis import perf_stats
-from monkey_api.domain.estimation import run_time_limit_s
-from monkey_api.domain.models import Issue, PerfSample, Progress, RunEndReason, RunResult, SessionConfig
-from monkey_api.domain.monkey_command import build_monkey_args
-from monkey_api.domain.monkey_output import MonkeyOutputTracker
+from monkey_api.domain.models import Issue, PerfSample, RunResult, SessionConfig
 from monkey_api.services import collectors
+from monkey_api.services.monkey_driver import Execution, MonkeyDriver
+from monkey_api.services.performance_collector import collect_performance
 from monkey_api.services.session_ledger import SessionLedger
-
-_EARLY_EXIT_S = 3.0
-_PROGRESS_EVERY_S = 1.0
 
 
 @dataclass(slots=True)
@@ -71,7 +66,7 @@ def _start_collectors(ctx: RunContext, run: int) -> list[asyncio.Task[None]]:
             collectors.collect_logcat(ctx.ops, cfg.device_serial, cfg.package, run, logcat_path, on_issue)
         ),
         asyncio.create_task(
-            collectors.sample_performance(ctx.ops, cfg.device_serial, cfg.package, run, s.perf_interval_s, on_sample)
+            collect_performance(ctx.ops, cfg.device_serial, cfg.package, run, s.perf_interval_s, on_sample, on_guard)
         ),
         asyncio.create_task(
             collectors.guard_app_state(
@@ -87,51 +82,6 @@ def _start_collectors(ctx: RunContext, run: int) -> list[asyncio.Task[None]]:
     ]
 
 
-async def _consume(
-    ctx: RunContext, stream: AdbStream, tracker: MonkeyOutputTracker, run: int, events: int, started: float
-) -> None:
-    last = 0.0
-    limit = run_time_limit_s(events, ctx.config.throttle_ms, ctx.config.target_minutes_per_run)
-    async for line in stream.lines():
-        tracker.feed(line)
-        now = time.monotonic()
-        if now - last >= _PROGRESS_EVERY_S:
-            last = now
-            elapsed = now - started
-            pct = max(tracker.events_sent / events if events else 0, elapsed / limit if limit else 0)
-            ctx.ledger.set_progress(
-                ctx.session_id,
-                Progress(
-                    current_run=run,
-                    total_runs=ctx.config.repeats,
-                    run_percent=min(100, int(pct * 100)),
-                    events_sent=tracker.events_sent,
-                    events_target=events,
-                    elapsed_s=round(elapsed, 1),
-                ),
-            )
-
-
-async def _drive_monkey(
-    ctx: RunContext, stream: AdbStream, tracker: MonkeyOutputTracker, run: int, events: int
-) -> RunEndReason:
-    started = time.monotonic()
-    limit = run_time_limit_s(events, ctx.config.throttle_ms, ctx.config.target_minutes_per_run)
-    consume = asyncio.create_task(_consume(ctx, stream, tracker, run, events, started))
-    stop = asyncio.create_task(ctx.stop.wait())
-    done, _ = await asyncio.wait({consume, stop}, timeout=limit, return_when=asyncio.FIRST_COMPLETED)
-    stop.cancel()
-    if consume not in done:
-        consume.cancel()
-        with contextlib.suppress(asyncio.CancelledError):
-            await consume
-        return "stopped" if ctx.stop.is_set() else "time_limit"
-    consume.result()  # re-raise reader errors
-    if time.monotonic() - started < _EARLY_EXIT_S and tracker.events_sent == 0:
-        return "failed_to_start"
-    return "aborted" if tracker.aborted else "completed"
-
-
 async def execute_run(ctx: RunContext, run: int, events: int, seed: int) -> RunResult:
     cfg = ctx.config
     started_at = utc_now()
@@ -140,42 +90,49 @@ async def execute_run(ctx: RunContext, run: int, events: int, seed: int) -> RunR
     ctx.samples.clear()
     await prepare_app(ctx)
     await ctx.ops.clear_logcat(cfg.device_serial)
+    prepared = time.monotonic()
     tasks = _start_collectors(ctx, run)
-    tracker = MonkeyOutputTracker()
-    exit_code: int | None = None
     try:
-        args = build_monkey_args(cfg, seed, events)
-        log("session", "monkey run starting", run=run, seed=seed, events=events, args=args)
-        stream = await ctx.ops.monkey(cfg.device_serial, args)
-        reason = await _drive_monkey(ctx, stream, tracker, run, events)
-        exit_code = await stream.terminate()
-        if reason in ("failed_to_start", "aborted"):
-            log(
-                "session",
-                f"monkey {reason}",
-                "ERROR",
-                run=run,
-                exit_code=exit_code,
-                stderr=(await stream.stderr_text())[:500],
-            )
+        result = await MonkeyDriver(ctx, run, events, seed).execute()
     finally:
         for task in tasks:
             task.cancel()
         await asyncio.gather(*tasks, return_exceptions=True)
-    if reason not in ("completed", "stopped") and not await ctx.ops.verify(cfg.device_serial):
-        reason = "device_lost"
+    if result.reason not in ("completed", "stopped") and not await ctx.ops.verify(cfg.device_serial):
+        result.reason = "device_lost"
+    return _result(ctx, run, events, seed, result, started_at, t0, prepared)
+
+
+def _result(
+    ctx: RunContext,
+    run: int,
+    events: int,
+    seed: int,
+    result: Execution,
+    started_at: datetime,
+    t0: float,
+    prepared: float,
+) -> RunResult:
     stats = perf_stats(ctx.samples)
+    total = time.monotonic() - t0
     return RunResult(
         run=run,
         seed=seed,
         events_target=events,
-        events_sent=tracker.events_sent,
-        throttle_ms=cfg.throttle_ms,
+        events_sent=result.events_sent,
+        throttle_ms=ctx.config.throttle_ms,
         started_at=started_at,
         ended_at=utc_now(),
-        duration_s=round(time.monotonic() - t0, 1),
-        exit_code=exit_code,
-        end_reason=reason,
+        duration_s=round(total, 3),
+        exit_code=result.exit_code,
+        end_reason=result.reason,
+        target_duration_s=(
+            ctx.config.target_minutes_per_run * 60 if ctx.config.target_minutes_per_run is not None else None
+        ),
+        execution_duration_s=round(result.duration_s, 3),
+        preparation_duration_s=round(prepared - t0, 3),
+        cleanup_duration_s=round(max(0, total - (prepared - t0) - result.duration_s), 3),
+        segments=result.segments,
         crashes=sum(1 for i in ctx.issues if i.kind in ("crash", "native_crash")),
         anrs=sum(1 for i in ctx.issues if i.kind == "anr"),
         mem_peak_mb=stats.memory_mb.max,

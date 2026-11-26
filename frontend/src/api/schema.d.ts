@@ -4,6 +4,28 @@
  */
 
 export interface paths {
+    "/api/v1/settings/ai": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ai Settings
+         * @description Never returns the API key or calls Gemini.
+         */
+        get: operations["ai_settings_api_v1_settings_ai_get"];
+        /** Configure Ai */
+        put: operations["configure_ai_api_v1_settings_ai_put"];
+        post?: never;
+        /** Delete Ai */
+        delete: operations["delete_ai_api_v1_settings_ai_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -245,6 +267,109 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/devices/{serial}/packages/{package}/icon": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Package Icon */
+        get: operations["package_icon_api_v1_devices__serial__packages__package__icon_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/play/packages/{package}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Package Releases */
+        get: operations["package_releases_api_v1_play_packages__package__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/play/auth": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Auth Status */
+        get: operations["auth_status_api_v1_play_auth_get"];
+        put?: never;
+        post?: never;
+        /** Disconnect */
+        delete: operations["disconnect_api_v1_play_auth_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/play/auth/client": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Configure Client */
+        post: operations["configure_client_api_v1_play_auth_client_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/play/auth/connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Connect */
+        post: operations["connect_api_v1_play_auth_connect_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/play/auth/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify */
+        post: operations["verify_api_v1_play_auth_check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/sessions": {
         parameters: {
             query?: never;
@@ -276,6 +401,26 @@ export interface paths {
         post?: never;
         /** Delete Session */
         delete: operations["delete_session_api_v1_sessions__session_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sessions/{session_id}/timing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Timing
+         * @description Deadline policy, current progress and measured per-segment execution history.
+         */
+        get: operations["get_timing_api_v1_sessions__session_id__timing_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -403,6 +548,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/sessions/{session_id}/performance-analysis/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Preview Performance Analysis */
+        get: operations["preview_performance_analysis_api_v1_sessions__session_id__performance_analysis_preview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sessions/{session_id}/performance-analysis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Analyze Performance */
+        post: operations["analyze_performance_api_v1_sessions__session_id__performance_analysis_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/sessions/{session_id}/report.html": {
         parameters: {
             query?: never;
@@ -454,10 +633,88 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/sessions/{session_id}/exports/xlsx": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Export Report Xlsx */
+        post: operations["export_report_xlsx_api_v1_sessions__session_id__exports_xlsx_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/settings/deployment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Status */
+        get: operations["status_api_v1_settings_deployment_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/settings/deployment/unlock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Unlock */
+        post: operations["unlock_api_v1_settings_deployment_unlock_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AIConclusion */
+        AIConclusion: {
+            /**
+             * Verdict
+             * @enum {string}
+             */
+            verdict: "normal" | "attention" | "abnormal" | "inconclusive";
+            /** Summary */
+            summary: string;
+            memory: components["schemas"]["AIFinding"];
+            cpu: components["schemas"]["AIFinding"];
+            stability: components["schemas"]["AIFinding"];
+            /** Recommendations */
+            recommendations: string[];
+            /** Limitations */
+            limitations: string[];
+        };
+        /** AIFinding */
+        AIFinding: {
+            /**
+             * Verdict
+             * @enum {string}
+             */
+            verdict: "normal" | "attention" | "abnormal" | "inconclusive";
+            /** Reason */
+            reason: string;
+        };
         /** AcceptedOut */
         AcceptedOut: {
             /** Message */
@@ -471,6 +728,81 @@ export interface components {
             available: boolean;
             /** Version */
             version: string | null;
+        };
+        /** AiSettingsIn */
+        AiSettingsIn: {
+            /**
+             * Api Key
+             * Format: password
+             */
+            api_key: string;
+            /**
+             * Model
+             * @default gemini-3.5-flash-lite
+             */
+            model: string;
+        };
+        /** AiSettingsOut */
+        AiSettingsOut: {
+            /**
+             * Configured
+             * @description A non-empty key was loaded; does not imply a successful API call
+             */
+            configured: boolean;
+            /** Enabled */
+            enabled: boolean;
+            /** Model */
+            model: string;
+            /** Config File */
+            config_file: string;
+            /**
+             * Restart Required
+             * @default false
+             */
+            restart_required: boolean;
+            /**
+             * Usage
+             * @default next_run_event_suggestion
+             * @constant
+             */
+            usage: "next_run_event_suggestion";
+        };
+        /** AnalysisPreview */
+        AnalysisPreview: {
+            /** Input Hash */
+            input_hash: string;
+            /** Model */
+            model: string;
+            /** Configured */
+            configured: boolean;
+            evidence: components["schemas"]["PerformanceEvidence"];
+        };
+        /** AnalysisRequest */
+        AnalysisRequest: {
+            /** Input Hash */
+            input_hash: string;
+            /**
+             * Consent
+             * @constant
+             */
+            consent: true;
+        };
+        /** AppIcon */
+        AppIcon: {
+            /** Package */
+            package: string;
+            /**
+             * Mime Type
+             * @default image/png
+             * @constant
+             */
+            mime_type: "image/png";
+            /** Data Base64 */
+            data_base64: string;
+            /** Fingerprint */
+            fingerprint: string;
+            /** Cached */
+            cached: boolean;
         };
         /** ConnectIn */
         ConnectIn: {
@@ -486,6 +818,15 @@ export interface components {
         ConnectOut: {
             /** Serial */
             serial: string;
+        };
+        /** DeploymentStatus */
+        DeploymentStatus: {
+            /** Available */
+            available: boolean;
+            /** Configured */
+            configured: boolean;
+            /** Account */
+            account: string;
         };
         /** Device */
         Device: {
@@ -527,8 +868,15 @@ export interface components {
         };
         /** Estimate */
         Estimate: {
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "time" | "events";
             /** Per Run S */
             per_run_s: number;
+            /** Per Run Events */
+            per_run_events: number;
             /** Overhead S */
             overhead_s: number;
             /** Buffer S */
@@ -538,8 +886,11 @@ export interface components {
         };
         /** EstimateIn */
         EstimateIn: {
-            /** Events */
-            events: number;
+            /**
+             * Events
+             * @description required unless target_minutes_per_run is set
+             */
+            events?: number | null;
             /** Repeats */
             repeats: number;
             /** Throttle Ms */
@@ -686,12 +1037,40 @@ export interface components {
             max: number | null;
             /** Avg */
             avg: number | null;
+            /** Stddev */
+            stddev?: number | null;
+            /** Median */
+            median?: number | null;
+            /** P90 */
+            p90?: number | null;
+            /** P95 */
+            p95?: number | null;
+            /** Time Weighted Avg */
+            time_weighted_avg?: number | null;
+            /**
+             * Observed Duration S
+             * @default 0
+             */
+            observed_duration_s: number;
+            /**
+             * Reference Exceeded S
+             * @default 0
+             */
+            reference_exceeded_s: number;
+            /**
+             * Longest Exceeded S
+             * @default 0
+             */
+            longest_exceeded_s: number;
         };
         /** PackageItem */
         PackageItem: {
             /** Name */
             name: string;
-            /** Display Name */
+            /**
+             * Display Name
+             * @description Android label in the device locale; package identifier if lookup fails
+             */
             display_name: string;
         };
         /** PackageList */
@@ -745,11 +1124,151 @@ export interface components {
             memory_mb: number | null;
             /** Cpu Percent */
             cpu_percent: number | null;
+            /**
+             * Source
+             * @default adb
+             * @enum {string}
+             */
+            source: "adb" | "appkium";
+            /** Cpu Total Percent */
+            cpu_total_percent: number | null;
+            /** Cpu Cores */
+            cpu_cores: number | null;
+            /** Rss Mb */
+            rss_mb: number | null;
+            /** Fps */
+            fps: number | null;
+            /** Jank Count */
+            jank_count: number | null;
+            /** Frame Time Max Ms */
+            frame_time_max_ms: number | null;
+            /** Threads */
+            threads: number | null;
+            /** Running */
+            running: boolean | null;
+            /** Foreground */
+            foreground: boolean | null;
+            /** Battery Temp C */
+            battery_temp_c: number | null;
+            /** Device Cpu Percent */
+            device_cpu_percent: number | null;
+            /** Sample Cost Ms */
+            sample_cost_ms: number | null;
         };
         /** PerfStats */
         PerfStats: {
             memory_mb: components["schemas"]["MetricStats"];
             cpu_percent: components["schemas"]["MetricStats"];
+            cpu_total_percent?: components["schemas"]["MetricStats"];
+        };
+        /** PerformanceAnalysis */
+        PerformanceAnalysis: {
+            /** Input Hash */
+            input_hash: string;
+            /** Model */
+            model: string;
+            /**
+             * Policy Version
+             * @default performance-v1
+             */
+            policy_version: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            conclusion: components["schemas"]["AIConclusion"];
+            /** Guardrails */
+            guardrails?: string[];
+            /** Duration Ms */
+            duration_ms: number;
+            /** Input Tokens */
+            input_tokens?: number | null;
+            /** Output Tokens */
+            output_tokens?: number | null;
+        };
+        /** PerformanceEvidence */
+        PerformanceEvidence: {
+            /**
+             * Policy Version
+             * @default performance-v1
+             */
+            policy_version: string;
+            state: components["schemas"]["SessionState"];
+            /** Planned Runs */
+            planned_runs: number;
+            /** Recorded Runs */
+            recorded_runs: number;
+            /** Events Sent */
+            events_sent: number;
+            /** Target Duration S */
+            target_duration_s: number | null;
+            issue_counts: components["schemas"]["IssueCounts"];
+            statistics: components["schemas"]["PerfStats"];
+            /** Per Run */
+            per_run: components["schemas"]["RunPerf"][];
+            assessment: components["schemas"]["ResourceAssessment"];
+            /**
+             * Baseline Available
+             * @default false
+             */
+            baseline_available: boolean;
+            /**
+             * App Budget Available
+             * @default false
+             */
+            app_budget_available: boolean;
+        };
+        /** PlayAuthStatus */
+        PlayAuthStatus: {
+            /** Client Configured */
+            client_configured: boolean;
+            /** Credentials Saved */
+            credentials_saved: boolean;
+            /**
+             * Phase
+             * @enum {string}
+             */
+            phase: "idle" | "pending" | "connected" | "error";
+            /** Message */
+            message: string;
+        };
+        /** PlayClientIn */
+        PlayClientIn: {
+            /**
+             * Client Json
+             * Format: password
+             */
+            client_json: string;
+        };
+        /** PlayPackage */
+        PlayPackage: {
+            /** Package */
+            package: string;
+            /**
+             * Source
+             * @default google_play_developer_api
+             * @constant
+             */
+            source: "google_play_developer_api";
+            /** Track */
+            track: string;
+            /**
+             * Checked At
+             * Format: date-time
+             */
+            checked_at: string;
+            /** Releases */
+            releases: components["schemas"]["PlayRelease"][];
+        };
+        /** PlayRelease */
+        PlayRelease: {
+            /** Release Name */
+            release_name: string;
+            /** Lifecycle State */
+            lifecycle_state: string;
+            /** Version Codes */
+            version_codes: string[];
         };
         /** Preset */
         Preset: {
@@ -850,6 +1369,58 @@ export interface components {
              * @default 0
              */
             elapsed_s: number;
+            /** Target Duration S */
+            target_duration_s: number | null;
+            /** Remaining S */
+            remaining_s: number | null;
+            /**
+             * Segment
+             * @default 0
+             */
+            segment: number;
+            /**
+             * Events Budget
+             * @default 0
+             */
+            events_budget: number;
+        };
+        /** ReportExportOut */
+        ReportExportOut: {
+            /** Path */
+            path: string;
+            /** Filename */
+            filename: string;
+        };
+        /** ResourceAssessment */
+        ResourceAssessment: {
+            /** Execution Duration S */
+            execution_duration_s: number | null;
+            /** Sample Count */
+            sample_count: number;
+            /** Collectors */
+            collectors: string[];
+            /** Findings */
+            findings: components["schemas"]["ResourceFinding"][];
+            /** Notes */
+            notes: string[];
+        };
+        /** ResourceFinding */
+        ResourceFinding: {
+            /** Metric */
+            metric: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "insufficient" | "observed" | "review";
+            /** Title */
+            title: string;
+            /** Evidence */
+            evidence: string;
+            /** Recommendation */
+            recommendation: string;
+            /** Coverage Percent */
+            coverage_percent: number | null;
         };
         /** RunPerf */
         RunPerf: {
@@ -888,6 +1459,16 @@ export interface components {
              * @enum {string}
              */
             end_reason: "completed" | "time_limit" | "aborted" | "stopped" | "failed_to_start" | "device_lost";
+            /** Target Duration S */
+            target_duration_s: number | null;
+            /** Execution Duration S */
+            execution_duration_s: number | null;
+            /** Preparation Duration S */
+            preparation_duration_s: number | null;
+            /** Cleanup Duration S */
+            cleanup_duration_s: number | null;
+            /** Segments */
+            segments: components["schemas"]["RunSegment"][];
             /**
              * Crashes
              * @default 0
@@ -902,6 +1483,26 @@ export interface components {
             mem_peak_mb: number | null;
             /** Cpu Peak Percent */
             cpu_peak_percent: number | null;
+        };
+        /** RunSegment */
+        RunSegment: {
+            /** Segment */
+            segment: number;
+            /** Seed */
+            seed: number;
+            /** Events Budget */
+            events_budget: number;
+            /** Events Sent */
+            events_sent: number;
+            /** Duration S */
+            duration_s: number;
+            /**
+             * End Reason
+             * @enum {string}
+             */
+            end_reason: "completed" | "time_limit" | "aborted" | "stopped" | "failed_to_start" | "device_lost";
+            /** Exit Code */
+            exit_code: number | null;
         };
         /** Session */
         Session: {
@@ -998,7 +1599,7 @@ export interface components {
             seq: number;
             /**
              * Type
-             * @description state_changed | progress | run_started | run_finished | issue | perf | log
+             * @description state_changed | progress | run_started | run_finished | run_extended | segment_started | segment_finished | issue | perf | log
              */
             type: string;
             /**
@@ -1018,7 +1619,10 @@ export interface components {
         };
         /** SessionOverrides */
         SessionOverrides: {
-            /** Events */
+            /**
+             * Events
+             * @description Fixed count in event mode; initial estimate in time mode (automatically extended on exhaustion)
+             */
             events?: number | null;
             /** Repeats */
             repeats?: number | null;
@@ -1028,7 +1632,10 @@ export interface components {
             seed?: number | null;
             /** Target Minutes Per Run */
             target_minutes_per_run?: number | null;
-            /** Adaptive */
+            /**
+             * Adaptive
+             * @description Next-run rate/Gemini suggestion; false does not disable extension within a time-based run
+             */
             adaptive?: boolean | null;
         };
         /** SessionReport */
@@ -1045,14 +1652,56 @@ export interface components {
             per_run: components["schemas"]["RunPerf"][];
             /** Suggestions */
             suggestions: string[];
+            /** Issue Suggestions */
+            issue_suggestions: string[];
             /** Samples */
             samples: components["schemas"]["PerfSample"][];
+            resource_assessment: components["schemas"]["ResourceAssessment"];
+            ai_performance?: components["schemas"]["PerformanceAnalysis"] | null;
         };
         /**
          * SessionState
          * @enum {string}
          */
         SessionState: "created" | "preparing" | "running" | "stopping" | "completed" | "failed" | "cancelled";
+        /** SessionTimingOut */
+        SessionTimingOut: {
+            /** Session Id */
+            session_id: string;
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "time" | "events";
+            /**
+             * Time Basis
+             * @default monotonic_wall_time
+             * @constant
+             */
+            time_basis: "monotonic_wall_time";
+            /**
+             * Completion Policy
+             * @enum {string}
+             */
+            completion_policy: "extend_until_deadline" | "event_count";
+            /** Target Per Run S */
+            target_per_run_s: number | null;
+            /**
+             * Target Total S
+             * @description Execution only; excludes preparation, cleanup and AI wait
+             */
+            target_total_s: number | null;
+            /**
+             * Completed Execution S
+             * @description Null if historical runs have no separate execution timing
+             */
+            completed_execution_s: number | null;
+            /** Extension Count */
+            extension_count: number;
+            progress: components["schemas"]["Progress"];
+            /** Runs */
+            runs: components["schemas"]["RunResult"][];
+        };
         /** TcpipIn */
         TcpipIn: {
             /**
@@ -1060,6 +1709,14 @@ export interface components {
              * @default 5555
              */
             port: number;
+        };
+        /** UnlockIn */
+        UnlockIn: {
+            /**
+             * Password
+             * Format: password
+             */
+            password: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -1083,6 +1740,130 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    ai_settings_api_v1_settings_ai_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiSettingsOut"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    configure_ai_api_v1_settings_ai_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiSettingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiSettingsOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    delete_ai_api_v1_settings_ai_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiSettingsOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
     health_api_v1_health_get: {
         parameters: {
             query?: never;
@@ -1818,6 +2599,7 @@ export interface operations {
                 query?: string | null;
                 include_system?: boolean;
                 third_party?: boolean;
+                refresh?: boolean;
             };
             header?: never;
             path: {
@@ -2062,6 +2844,805 @@ export interface operations {
             };
         };
     };
+    package_icon_api_v1_devices__serial__packages__package__icon_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                serial: string;
+                package: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppIcon"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    package_releases_api_v1_play_packages__package__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                package: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayPackage"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    auth_status_api_v1_play_auth_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayAuthStatus"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    disconnect_api_v1_play_auth_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayAuthStatus"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    configure_client_api_v1_play_auth_client_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlayClientIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayAuthStatus"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    connect_api_v1_play_auth_connect_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayAuthStatus"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    verify_api_v1_play_auth_check_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayAuthStatus"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
     list_sessions_api_v1_sessions_get: {
         parameters: {
             query?: never;
@@ -2253,6 +3834,57 @@ export interface operations {
                 content: {
                     "application/problem+json": unknown;
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_timing_api_v1_sessions__session_id__timing_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionTimingOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
             /** @description Internal Server Error */
@@ -2655,6 +4287,164 @@ export interface operations {
             };
         };
     };
+    preview_performance_analysis_api_v1_sessions__session_id__performance_analysis_preview_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnalysisPreview"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    analyze_performance_api_v1_sessions__session_id__performance_analysis_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnalysisRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PerformanceAnalysis"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Gateway Timeout */
+            504: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
     get_report_html_api_v1_sessions__session_id__report_html_get: {
         parameters: {
             query?: never;
@@ -2801,6 +4591,161 @@ export interface operations {
                 content: {
                     "application/problem+json": unknown;
                     "text/plain": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    export_report_xlsx_api_v1_sessions__session_id__exports_xlsx_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportExportOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    status_api_v1_settings_deployment_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentStatus"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    unlock_api_v1_settings_deployment_unlock_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UnlockIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentStatus"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": unknown;
+                    "application/json": components["schemas"]["Problem"];
                 };
             };
         };

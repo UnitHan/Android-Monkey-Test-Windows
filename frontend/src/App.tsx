@@ -1,18 +1,27 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { ApiError, api, type PackageItem, type SessionCreate } from "./api/client";
 import {
   TERMINAL, useCreateAndStart, useDevices, useHealth, usePackages, usePresets, useSession, useSessionStream,
-  useSessions, useStopSession,
+  useSessions, useStopSession, refreshAppInfo,
 } from "./api/hooks";
 import { ConnectionWizard, type Connection } from "./components/ConnectionWizard";
 import { ConsolePanel } from "./components/ConsolePanel";
-import { PerfGraphDialog } from "./components/PerfGraphDialog";
+import { PerformanceWorkspace } from "./components/PerformanceWorkspace";
+import { ResultsWorkspace } from "./components/ResultsWorkspace";
+import { HtmlReportWorkspace } from "./components/HtmlReportWorkspace";
 import { ReportNotebook } from "./components/ReportNotebook";
 import {
-  TestSettings, effectiveConfig, type CustomFields, type DeviceStatus, type PresetChoice,
+  TestSettings, type DeviceStatus,
 } from "./components/TestSettings";
-import { MessageBox, Progressbar, Toplevel } from "./components/tk";
+import {
+  DEFAULT_FIELDS, effectiveConfig, overridesFor, type CustomFields, type PresetChoice,
+} from "./components/presetConfig";
+import { Button, MessageBox, Progressbar, Toplevel } from "./components/tk";
+import { GooglePlaySettings } from "./components/GooglePlaySettings";
+import { RebootDialog } from "./components/RebootDialog";
+import { usePlayAuthStatus } from "./api/playAuthHooks";
+import { WorkspaceTabs, type Workspace } from "./components/WorkspaceTabs";
 
 type Msg = { title: string; message: string; kind: "info" | "error" };
 
@@ -23,22 +32,48 @@ const errMsg = (e: unknown) =>
 export function App() {
   const qc = useQueryClient();
   const [connection, setConnection] = useState<Connection | null>(null);
-  const [app, setApp] = useState<PackageItem | null>(null);
-  const [preset, setPreset] = useState<PresetChoice>("quick");
-  const [fields, setFields] = useState<CustomFields>({ events: "3000", repeats: "5", throttle: "200", seed: "1000" });
+  const [appName, setAppName] = useState<string | null>(null);
+  const setApp = (item: PackageItem | null) => setAppName(item?.name ?? null);
+  const [preset, setPreset] = useState<PresetChoice>("smoke");
+  const [fields, setFields] = useState<CustomFields>(DEFAULT_FIELDS);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [consoleOpen, setConsoleOpen] = useState(false);
-  const [perfOpen, setPerfOpen] = useState(false);
+  const [workspaceTab, setWorkspaceTab] = useState<Workspace>("main");
+  const selectWorkspace = (tab: Workspace) => {
+    if (tab === "console") setConsoleOpen(true);
+    setWorkspaceTab(tab);
+  };
+  const [exporting, setExporting] = useState(false);
   const [msg, setMsg] = useState<Msg | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [rebootTarget, setRebootTarget] = useState<string | null>(null);
 
   const health = useHealth();
+  const deployment = useQuery({ queryKey: ["deployment-settings"], queryFn: api.deploymentStatus,
+    enabled: !!health.data, retry: false });
+  useEffect(() => {
+    if (deployment.data?.available && !deployment.data.configured) setSettingsOpen(true);
+  }, [deployment.data?.available, deployment.data?.configured]);
+  usePlayAuthStatus(!!health.data);
   const devices = useDevices();
   const presets = usePresets();
   const sessions = useSessions();
   const packages = usePackages(connection?.serial ?? null, "", false);
+  const app = appName ? packages.data?.items.find((item) => item.name === appName)
+    ?? { name: appName, display_name: appName } : null;
   const session = useSession(sessionId);
   const s = session.data;
   useSessionStream(sessionId, s?.state);
+  const exportExcel = async () => {
+    if (!s || exporting) return;
+    setExporting(true);
+    try {
+      const saved = await api.exportExcel(s.id);
+      setMsg({ title: "엑셀 저장 완료", kind: "info", message: `엑셀 보고서를 저장했습니다.\n\n${saved.path}` });
+    } catch (e) {
+      setMsg({ title: "엑셀 저장 실패", kind: "error", message: errMsg(e) });
+    } finally { setExporting(false); }
+  };
   const start = useCreateAndStart();
   const stop = useStopSession();
 
@@ -64,7 +99,11 @@ export function App() {
       </Toplevel>
     );
   }
-  if (!connection) return <ConnectionWizard onConnected={setConnection} />;
+  if (!connection) return <>
+    <ConnectionWizard onConnected={setConnection} />
+    {!settingsOpen && <Button style={{ position: "fixed", right: 12, top: 12, zIndex: 1000 }} onClick={() => setSettingsOpen(true)}>설정</Button>}
+    {settingsOpen && <GooglePlaySettings onClose={() => setSettingsOpen(false)} />}
+  </>;
 
   const device = devices.data?.find((d) => d.serial === connection.serial);
   const deviceStatus: DeviceStatus = devices.isLoading ? "checking" : device?.state === "device" ? "connected" : "lost";
@@ -77,14 +116,12 @@ export function App() {
 
   const onStart = () => {
     const cfg = effectiveConfig(preset, presets.data, fields);
-    if (!cfg || !app) return;
+    if (!cfg?.valid || !app) return;
     const body: SessionCreate = {
       device_serial: connection.serial,
       package: app.name,
       preset_id: preset,
-      overrides: cfg.editable
-        ? { events: cfg.events, repeats: cfg.repeats, throttle_ms: cfg.throttle_ms, seed: cfg.seed }
-        : null,
+      overrides: overridesFor(cfg),
     };
     start.mutate(body, {
       onSuccess: (created) => setSessionId(created.id),
@@ -100,7 +137,9 @@ export function App() {
 
   return (
     <div className="app-shell">
-      <div className="main-content">
+      <WorkspaceTabs active={workspaceTab} onSelect={selectWorkspace} onSettings={() => setSettingsOpen(true)} />
+      <div className="workspace-panel main-content" role="tabpanel" id="workspace-main"
+        aria-labelledby="workspace-tab-main" hidden={workspaceTab !== "main"}>
         <TestSettings
           connection={connection}
           deviceStatus={deviceStatus}
@@ -116,24 +155,45 @@ export function App() {
           packageStatus={packageStatus}
           onStart={onStart}
           onStop={() => s && stop.mutate(s.id, { onError: (e) => setMsg({ title: "테스트 중지", kind: "error", message: errMsg(e) }) })}
-          onReboot={() =>
-            window.confirm("폰을 재부팅하시겠습니까?") &&
-            action("폰 재부팅", () => api.reboot(connection.serial), "재부팅 명령을 전송했습니다.")
-          }
+          onReboot={() => setRebootTarget(connection.serial)}
           onDisconnect={() =>
             window.confirm("무선 연결을 종료하시겠습니까?") &&
             action("무선 연결 종료", () => api.disconnect(connection.serial)).then(() => setConnection(null))
           }
           onLaunch={() => app && action("앱 실행", () => api.launch(connection.serial, app.name))}
-          onRefresh={() => void qc.invalidateQueries({ queryKey: ["packages"] })}
-          onShowPerf={() => setPerfOpen(true)}
-          onToggleConsole={() => setConsoleOpen((v) => !v)}
+          onRefresh={() => void refreshAppInfo(qc, connection.serial, app?.name)}
+          onShowPerf={() => selectWorkspace("performance")}
+          onShowReport={() => selectWorkspace("report")}
+          onExportExcel={() => void exportExcel()}
+          exporting={exporting}
+          onToggleConsole={() => selectWorkspace("console")}
         />
-        <ReportNotebook session={s} presetName={presetName} history={sessions.data ?? []} onPickHistory={setSessionId} />
+        <ReportNotebook session={s} presetName={presetName} history={sessions.data ?? []} onPickHistory={setSessionId}
+          onDeleteHistory={id => { if (sessionId === id) setSessionId(null); }} />
       </div>
-      {consoleOpen && <ConsolePanel sessionId={sessionId} onHide={() => setConsoleOpen(false)} />}
-      {perfOpen && s && <PerfGraphDialog session={s} onClose={() => setPerfOpen(false)} />}
+      <div className="workspace-panel console-workspace" role="tabpanel" id="workspace-console"
+        aria-labelledby="workspace-tab-console" hidden={workspaceTab !== "console"}>
+        {consoleOpen && <ConsolePanel sessionId={sessionId} active={workspaceTab === "console"}
+          onBack={() => selectWorkspace("main")} />}
+      </div>
+      <div className="workspace-panel dashboard-workspace" role="tabpanel" id="workspace-performance" tabIndex={0}
+        aria-labelledby="workspace-tab-performance" hidden={workspaceTab !== "performance"}>
+        {workspaceTab === "performance" && <PerformanceWorkspace session={s} />}
+      </div>
+      <div className="workspace-panel dashboard-workspace" role="tabpanel" id="workspace-results" tabIndex={0}
+        aria-labelledby="workspace-tab-results" hidden={workspaceTab !== "results"}>
+        {workspaceTab === "results" && <ResultsWorkspace session={s} history={sessions.data ?? []} onSelect={setSessionId} />}
+      </div>
+      <div className="workspace-panel report-workspace" role="tabpanel" id="workspace-report"
+        aria-labelledby="workspace-tab-report" hidden={workspaceTab !== "report"}>
+        {workspaceTab === "report" && <HtmlReportWorkspace session={s} />}
+      </div>
       {msg && <MessageBox {...msg} onClose={() => setMsg(null)} />}
+      {rebootTarget && <RebootDialog serial={rebootTarget} onClose={() => setRebootTarget(null)} onDone={() => {
+        setRebootTarget(null);
+        setMsg({ title: "폰 재부팅", kind: "info", message: "재부팅 명령을 전송했습니다." });
+      }} />}
+      {settingsOpen && <GooglePlaySettings onClose={() => setSettingsOpen(false)} />}
     </div>
   );
 }

@@ -3,7 +3,12 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ApiError } from "./api/client";
 import { App } from "./App";
+import { installReloadGuard } from "./reloadGuard";
 import "./styles.css";
+import "./scrollShadows.css";
+
+const removeReloadGuard = installReloadGuard();
+if (import.meta.hot) import.meta.hot.dispose(removeReloadGuard);
 
 const queryClient = new QueryClient({
   defaultOptions: {

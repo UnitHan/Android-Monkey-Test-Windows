@@ -9,3 +9,12 @@ dist/
 .env
 backend/data/
 *.tsbuildinfo
+client_secret*.json
+play-oauth*.json
+play-client*.json
+frontend/src-tauri/runtime/
+*.enc.json
+deployment.vault.json
+deployment-password*.txt
+.env.*
+.vscode/

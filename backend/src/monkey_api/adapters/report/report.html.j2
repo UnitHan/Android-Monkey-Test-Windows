@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>테스트 결과 보고서 · {{ s.config.package }}</title><style>{{ css|safe }}</style></head>
+<body><main class="report-scroll" tabindex="0" aria-label="테스트 보고서"><div class="report-page">
+<header class="report-header"><div><p class="eyebrow">ANDROID MONKEY · TEST REPORT</p><h1>테스트 결과 보고서</h1>
+<p class="muted">{{ (s.started_at or s.created_at)|kst }} ~ {{ s.ended_at|kst }} · 한국 표준시</p></div>
+<span class="status {{ s.state.value }}">{{ states.get(s.state.value, s.state.value) }}</span></header>
+<section class="card app-card" aria-label="앱과 테스트 환경">
+<div class="app-identity"><span class="label">테스트 대상 패키지</span><h2>{{ s.config.package }}</h2>
+<p class="muted">설치 버전 {{ s.app_version.version_name if s.app_version else '—' }}{% if s.app_version %} ({{s.app_version.version_code}}){% endif %}</p></div>
+<dl class="environment"><div><dt>기기</dt><dd>{{ s.device.model if s.device else s.config.device_serial }}</dd></div>
+<div><dt>Android</dt><dd>{{ s.device.android_version if s.device else '—' }}</dd></div>
+<div><dt>프리셋</dt><dd>{{ s.config.preset_id }}</dd></div>
+<div><dt>실제 이벤트 실행</dt><dd>{{ r.resource_assessment.execution_duration_s|duration }}</dd></div>
+<div><dt>설정한 총 실행 시간</dt><dd>{{ (s.config.target_minutes_per_run * s.config.repeats * 60)|duration if s.config.target_minutes_per_run else '이벤트 수 기준' }}</dd></div>
+<div><dt>준비·정리 포함 회차 합계</dt><dd>{{ r.total_duration_s|duration }}</dd></div></dl></section>
+{% if s.state.value != 'completed' %}<aside class="notice">{{ states.get(s.state.value,s.state.value) }} 상태의 보고서입니다. 현재까지 수집된 결과이며 전체 테스트 완료를 의미하지 않습니다.{% if s.error %}<br>{{s.error}}{% endif %}</aside>{% endif %}
+<section class="kpis" aria-label="핵심 결과">
+<div class="card"><span class="label">기록된 회차 / 계획</span><strong>{{s.runs|length}} <small>/ {{s.config.repeats}}</small></strong></div>
+<div class="card"><span class="label">누적 주입 이벤트</span><strong>{{r.total_events_sent|number}} <small>건</small></strong></div>
+<div class="card"><span class="label">크래시 · 네이티브 포함</span><strong class="{{'bad' if s.issue_counts.crash + s.issue_counts.native_crash else ''}}">{{s.issue_counts.crash + s.issue_counts.native_crash}} <small>건</small></strong></div>
+<div class="card"><span class="label">ANR</span><strong class="{{'bad' if s.issue_counts.anr else ''}}">{{s.issue_counts.anr}} <small>건</small></strong></div></section>
+<nav aria-label="보고서 바로가기"><a href="#assessment">관측 요약</a><a href="#performance">성능 추이</a><a href="#statistics">자원 통계</a><a href="#runs">회차별 결과</a><a href="#issues">이슈 상세</a></nav>
+{% if r.ai_performance %}{% set ai=r.ai_performance %}<section class="card" id="ai-analysis"><h2>Gemini 성능 판정 · {{verdicts[ai.conclusion.verdict]}}</h2>
+<p class="section-note">{{ai.model}} · {{ai.created_at|kst}} · 관측 범위의 AI 해석이며 출시 합격 판정은 아닙니다.</p><p>{{ai.conclusion.summary}}</p>
+<div class="findings">{% for key,label in [('memory','메모리'),('cpu','CPU'),('stability','안정성')] %}{% set f=ai.conclusion|attr(key) %}<article class="finding"><span class="tag">{{label}} · {{verdicts[f.verdict]}}</span><p>{{f.reason}}</p></article>{% endfor %}</div>
+<h3>권고사항</h3><ul>{% for text in ai.conclusion.recommendations %}<li>{{text}}</li>{% endfor %}</ul>
+<h3>해석 범위 및 한계</h3><ul>{% for text in ai.conclusion.limitations + ai.guardrails %}<li>{{text}}</li>{% endfor %}</ul></section>{% endif %}
+<section class="card" id="assessment"><h2>관측 요약 및 권고사항</h2><p class="section-note">최댓값 하나로 결함을 판정하지 않습니다. 수집 범위와 관측 근거를 함께 확인하세요.</p>
+<div class="findings">{% for f in r.resource_assessment.findings %}<article class="finding {{f.status}}"><span class="tag">{{ {'insufficient':'판단 보류','observed':'관측 결과','review':'추가 확인'}.get(f.status,f.status) }}</span><h3>{{f.title}}</h3><p>{{f.evidence}}</p><p class="recommendation">{{f.recommendation}}</p></article>{% endfor %}</div>
+{% if r.issue_suggestions %}<ul class="issue-notes">{% for x in r.issue_suggestions %}<li>{{x}}</li>{% endfor %}</ul>{% endif %}</section>
+<section class="card" id="performance"><h2>성능 추이</h2><p class="section-note">첫 수집 시점부터의 경과 시간 · 수집 공백과 회차 경계는 연결하지 않습니다.</p>
+<div class="charts">{% for chart in charts %}<figure><figcaption><h3>{{chart.title}} <span class="muted">({{chart.unit}})</span></h3><p class="chart-summary">평균 <b>{{chart.stats.avg|number}}</b> · 최대 <b>{{chart.stats.max|number}}</b> · P90 <b>{{chart.stats.p90|number}}</b></p></figcaption>
+{% if chart.stats.samples %}<svg viewBox="0 0 640 240" role="img" aria-label="{{chart.title}} 추이"><title>{{chart.title}}: {{chart.stats.samples}}개 표본, 최솟값 {{chart.stats.min|number}}, 최댓값 {{chart.stats.max|number}} {{chart.unit}}</title>
+{% for y,value in chart.y_ticks %}<line x1="52" y1="{{y}}" x2="624" y2="{{y}}" class="grid"/><text x="43" y="{{y+5}}" text-anchor="end">{{value|number}}</text>{% endfor %}
+{% for x,label in chart.x_ticks %}<text x="{{x}}" y="228" text-anchor="{{'start' if loop.first else 'end' if loop.last else 'middle'}}">{{label}}</text>{% endfor %}
+{% for path in chart.paths %}<path d="{{path}}" fill="none" stroke="{{chart.color}}" stroke-width="2" vector-effect="non-scaling-stroke"/>{% endfor %}
+{% for x,y in chart.dots %}<circle cx="{{x}}" cy="{{y}}" r="3" fill="{{chart.color}}"/>{% endfor %}</svg>
+{% else %}<div class="empty">수집된 성능 표본이 없습니다.</div>{% endif %}</figure>{% endfor %}</div>
+<p class="section-note">CPU 코어 합산은 여러 코어를 사용하면 100%를 넘을 수 있습니다. 기기 전체 용량 대비 사용률은 아래 통계에서 구분합니다.</p></section>
+{% macro metrics(stats) -%}<div class="table-scroll" tabindex="0" aria-label="자원 통계 표"><table><thead><tr><th>지표</th><th>표본</th><th>평균</th><th>시간 가중 평균</th><th>최소</th><th>최대</th><th>표준편차</th><th>P50</th><th>P90</th><th>P95</th><th>관측 초</th></tr></thead><tbody>
+{% for key,label in [('memory_mb','메모리 PSS (MB)'),('cpu_percent','CPU 코어 합산 (%)'),('cpu_total_percent','CPU 기기 용량 대비 (%)')] %}{% set v=stats|attr(key) %}<tr><th scope="row">{{label}}</th><td>{{v.samples|number}}</td>{% for field in ['avg','time_weighted_avg','min','max','stddev','median','p90','p95','observed_duration_s'] %}<td>{{(v|attr(field))|number}}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>{%- endmacro %}
+<section class="card" id="statistics"><h2>성능 자원 통계</h2><p class="section-note">전체 회차의 유효 표본 기준 · 누락된 값은 ‘—’로 표시합니다.</p>{{metrics(r.perf)}}
+<details><summary>계산 방식과 해석 범위</summary><ul>{% for note in r.resource_assessment.notes %}<li>{{note}}</li>{% endfor %}</ul></details>
+{% for run in r.per_run %}<details><summary>{{run.run}}회차 자원 통계</summary>{{metrics(run.stats)}}</details>{% endfor %}</section>
+<section class="card" id="runs"><h2>회차별 실행 결과</h2><p class="section-note">이벤트 실행 시간과 목표 시간을 비교하고, 각 회차의 종료 사유를 확인하세요.</p>
+<div class="table-scroll" tabindex="0" aria-label="회차별 실행 결과 표"><table><thead><tr><th>회차</th><th>Seed</th><th>주입 / 초기 이벤트</th><th>실행 / 목표 시간</th><th>이벤트 연장</th><th>크래시</th><th>ANR</th><th>메모리 최대 MB</th><th>CPU 최대 %</th><th>종료 사유</th></tr></thead><tbody>
+{% for x in s.runs %}<tr><th scope="row">{{x.run}}회</th><td>{{x.seed}}</td><td>{{x.events_sent|number}} / {{x.events_target|number}}</td><td>{{x.execution_duration_s|duration}} / {{x.target_duration_s|duration}}</td><td>{{ [0, x.segments|length - 1]|max }}회</td><td>{{x.crashes}}</td><td>{{x.anrs}}</td><td>{{x.mem_peak_mb|number}}</td><td>{{x.cpu_peak_percent|number}}</td><td><span class="tag">{{'목표 시간 도달' if x.end_reason == 'time_limit' and x.target_duration_s else ends.get(x.end_reason,x.end_reason)}}</span></td></tr>{% else %}<tr><td colspan="10" class="empty">기록된 회차가 없습니다.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="card" id="issues"><h2>이슈 상세 <span class="muted">{{r.issues|length}}건</span></h2>
+{% for i in r.issues %}<details class="issue"><summary><span class="tag">{{i.kind}}</span> {{i.run}}회차 · {{i.summary}}</summary><pre tabindex="0">{{i.lines|join('\n')}}</pre></details>{% else %}<p class="empty">수집된 크래시 / ANR 상세 로그가 없습니다.</p>{% endfor %}</section>
+<footer>세션 {{s.id}} · 모든 시각은 한국 표준시(KST)입니다.</footer>
+</div></main></body></html>

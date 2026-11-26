@@ -1,17 +1,17 @@
-"""Result analysis: performance statistics and improvement suggestions (pure)."""
+"""Descriptive resource statistics; missing values and run gaps are never zero-filled."""
 
 from __future__ import annotations
 
+import math
 from collections.abc import Iterable
+from statistics import median, pstdev
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from monkey_api.domain.models import IssueCounts, PerfSample
 
-MEMORY_PEAK_WARN_MB = 200
-MEMORY_AVG_WARN_MB = 100
-CPU_PEAK_WARN = 80
-CPU_AVG_WARN = 50
+MAX_OBSERVED_GAP_S = 10.0
+CPU_CAPACITY_REFERENCE = 80.0
 
 
 class MetricStats(BaseModel):
@@ -19,45 +19,96 @@ class MetricStats(BaseModel):
     min: float | None
     max: float | None
     avg: float | None
+    stddev: float | None = None
+    median: float | None = None
+    p90: float | None = None
+    p95: float | None = None
+    time_weighted_avg: float | None = None
+    observed_duration_s: float = 0
+    reference_exceeded_s: float = 0
+    longest_exceeded_s: float = 0
 
 
 class PerfStats(BaseModel):
     memory_mb: MetricStats
     cpu_percent: MetricStats
+    cpu_total_percent: MetricStats = Field(default_factory=lambda: metric_stats([]))
 
 
 def metric_stats(values: Iterable[float | None]) -> MetricStats:
-    vals = [v for v in values if v is not None]
+    vals = sorted(v for v in values if v is not None and math.isfinite(v) and v >= 0)
     if not vals:
         return MetricStats(samples=0, min=None, max=None, avg=None)
-    return MetricStats(samples=len(vals), min=min(vals), max=max(vals), avg=round(sum(vals) / len(vals), 1))
+    return MetricStats(
+        samples=len(vals),
+        min=min(vals),
+        max=max(vals),
+        avg=round(sum(vals) / len(vals), 2),
+        stddev=round(pstdev(vals), 2),
+        median=median(vals),
+        p90=vals[math.ceil(len(vals) * 0.90) - 1],
+        p95=vals[math.ceil(len(vals) * 0.95) - 1],
+    )
+
+
+def _value(sample: PerfSample, metric: str) -> float | None:
+    value = getattr(sample, metric)
+    if sample.running is False or value is None or not math.isfinite(value) or value < 0:
+        return None
+    if metric == "cpu_total_percent" and value > 100:
+        return None
+    return value
+
+
+def timed_metric(samples: list[PerfSample], metric: str) -> MetricStats:
+    ordered = sorted(samples, key=lambda s: (s.run, s.at))
+    stats = metric_stats(_value(s, metric) for s in ordered)
+    area = duration = exceeded = longest = streak = 0.0
+    for before, after in zip(ordered, ordered[1:], strict=False):
+        dt = (after.at - before.at).total_seconds()
+        a, b = _value(before, metric), _value(after, metric)
+        if before.run != after.run or before.source != after.source or not 0 < dt <= MAX_OBSERVED_GAP_S:
+            streak = 0
+            continue
+        if a is None or b is None:
+            streak = 0
+            continue
+        duration += dt
+        area += (a + b) / 2 * dt
+        if metric == "cpu_total_percent" and min(a, b) >= CPU_CAPACITY_REFERENCE:
+            exceeded += dt
+            streak += dt
+            longest = max(longest, streak)
+        else:
+            streak = 0
+    return stats.model_copy(
+        update={
+            "time_weighted_avg": round(area / duration, 2) if duration else None,
+            "observed_duration_s": round(duration, 3),
+            "reference_exceeded_s": round(exceeded, 3),
+            "longest_exceeded_s": round(longest, 3),
+        }
+    )
 
 
 def perf_stats(samples: Iterable[PerfSample], run: int | None = None) -> PerfStats:
     selected = [s for s in samples if run is None or s.run == run]
-    return PerfStats(
-        memory_mb=metric_stats(s.memory_mb for s in selected),
-        cpu_percent=metric_stats(s.cpu_percent for s in selected),
-    )
+    return PerfStats(**{key: timed_metric(selected, key) for key in ("memory_mb", "cpu_percent", "cpu_total_percent")})
 
 
 def suggestions(counts: IssueCounts, stats: PerfStats) -> list[str]:
+    """Issue facts only; resource interpretation lives in resource_assessment."""
     out: list[str] = []
     if counts.crash:
-        out.append(f"크래시 {counts.crash}회 발생: 크래시 로그 분석 및 예외 처리 강화 필요")
+        out.append(f"크래시 {counts.crash}회 기록: 해당 스택과 발생 직전 로그로 원인을 확인하세요.")
     if counts.native_crash:
-        out.append(f"네이티브 크래시 {counts.native_crash}회 발생: tombstone/NDK 코드 점검 필요")
+        out.append(f"네이티브 크래시 {counts.native_crash}회 기록: 해당 tombstone과 심볼 정보를 대조하세요.")
     if counts.anr:
-        out.append(f"ANR {counts.anr}회 발생: 메인 스레드 작업 최적화 및 비동기 처리 필요")
-    mem, cpu = stats.memory_mb, stats.cpu_percent
-    if mem.max is not None and mem.max > MEMORY_PEAK_WARN_MB:
-        out.append(f"메모리 사용량 높음 (최대 {round(mem.max)}MB): 메모리 누수 확인 필요")
-    elif mem.avg is not None and mem.avg > MEMORY_AVG_WARN_MB:
-        out.append(f"평균 메모리 사용량 주의 ({round(mem.avg)}MB): 메모리 최적화 권장")
-    if cpu.max is not None and cpu.max > CPU_PEAK_WARN:
-        out.append(f"CPU 사용률 높음 (최대 {round(cpu.max)}%): 연산 최적화 필요")
-    elif cpu.avg is not None and cpu.avg > CPU_AVG_WARN:
-        out.append(f"평균 CPU 사용률 주의 ({round(cpu.avg)}%): 성능 최적화 권장")
+        out.append(
+            f"ANR {counts.anr}회 기록: 스레드 덤프에서 대기·락·I/O 상태를 확인하세요. 원인은 아직 확정되지 않았습니다."
+        )
     if not out:
-        out.append("특별한 이슈가 발견되지 않았습니다.")
+        out.append("수집된 로그에서 크래시·ANR이 기록되지 않았습니다. 성능 적합성 판정과는 별개입니다.")
+    if not stats.memory_mb.samples and not stats.cpu_percent.samples:
+        out.append("유효한 성능 표본이 없어 자원 사용량은 판단할 수 없습니다.")
     return out

@@ -1930,11 +1930,13 @@ dependencies = [
 
 [[package]]
 name = "monkey-test"
-version = "4.0.0"
+version = "4.0.6"
 dependencies = [
  "serde_json",
  "tauri",
  "tauri-build",
+ "webview2-com",
+ "windows",
 ]
 
 [[package]]

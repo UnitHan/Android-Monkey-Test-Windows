@@ -1,11 +1,16 @@
 """Built-in test presets as data.
 
-Values come from the legacy tool's *effective* runtime behaviour (legacy monkey_runner.py hard-coded
-throttle/target/seed per preset, which differed from legacy config.PRESETS). One table now.
+Time-boxed presets (target_minutes_per_run set) follow the time rule in domain/estimation.py:
+normal event completion extends until the deadline; errors/stop are recorded separately.
+`events` is derived from target and throttle, never hand-typed.
+
+Total execution targets: Smoke 30 minutes, Standard 60, Deep 180, Extreme 480.
+Preparation and cleanup are outside these targets. Quick is no longer offered.
 """
 
 from __future__ import annotations
 
+from monkey_api.domain.estimation import expected_events
 from monkey_api.domain.models import EventMix, Preset
 
 _LIGHT_MIX = EventMix(
@@ -26,45 +31,22 @@ PRESETS: tuple[Preset, ...] = (
         id="smoke",
         name="Smoke Test",
         description="빠른 안정성 확인",
-        events=3500,
+        events=expected_events(6, 250),
         repeats=5,
         throttle_ms=250,
-        target_minutes_per_run=7,
+        target_minutes_per_run=6,
         seed_mode="random",
         event_mix=_LIGHT_MIX,
         adaptive_margin=0.20,
     ),
     Preset(
-        id="quick",
-        name="Quick Test",
-        description="중강도 균형 테스트",
-        events=7750,
-        repeats=5,
-        throttle_ms=220,
-        target_minutes_per_run=10,
-        seed_mode="random",
-        event_mix=EventMix(
-            touch=27,
-            motion=25,
-            trackball=0,
-            nav=12,
-            majornav=10,
-            syskeys=5,
-            appswitch=4,
-            anyevent=17,
-            pinchzoom=0,
-            rotation=0,
-        ),
-        adaptive_margin=0.15,
-    ),
-    Preset(
         id="standard",
         name="Standard Test",
         description="표준 품질 보증 테스트",
-        events=12000,
+        events=expected_events(10, 200),
         repeats=6,
         throttle_ms=200,
-        target_minutes_per_run=15,
+        target_minutes_per_run=10,
         seed_mode="random",
         event_mix=EventMix(
             touch=28,
@@ -84,7 +66,7 @@ PRESETS: tuple[Preset, ...] = (
         id="deep",
         name="Deep Test",
         description="고강도 장시간 테스트 (고정 시드)",
-        events=22000,
+        events=expected_events(18, 150),
         repeats=10,
         throttle_ms=150,
         target_minutes_per_run=18,
@@ -107,7 +89,7 @@ PRESETS: tuple[Preset, ...] = (
         id="extreme",
         name="Extreme Test",
         description="최대 강도 내구성 테스트 (고정 시드)",
-        events=32500,
+        events=expected_events(32, 180),
         repeats=15,
         throttle_ms=180,
         target_minutes_per_run=32,
@@ -141,8 +123,8 @@ PRESETS: tuple[Preset, ...] = (
         id="custom",
         name="Custom",
         description="사용자 지정 (overrides 사용)",
-        events=1000,
-        repeats=1,
+        events=3000,
+        repeats=5,
         throttle_ms=200,
         target_minutes_per_run=None,
         seed_mode="random",

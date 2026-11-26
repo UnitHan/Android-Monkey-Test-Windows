@@ -10,13 +10,14 @@
 from __future__ import annotations
 
 import json
+import shutil
 import threading
 from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel
 
-from monkey_api.core.errors import SessionNotFound
+from monkey_api.core.errors import AppError, SessionNotFound
 from monkey_api.core.ids import utc_now
 from monkey_api.domain.models import Issue, PerfSample, Session, SessionEvent
 
@@ -58,12 +59,17 @@ class SessionRepository:
     def delete(self, session_id: str) -> None:
         with self._lock:
             self.get(session_id)
+            d = self.dir_for(session_id)
+            root = self.root.resolve()
+            if d.resolve().parent != root or d.is_symlink() or d.is_junction():
+                raise AppError("안전한 테스트 기록 경로가 아니어서 삭제하지 않았습니다.")
+            try:
+                if d.exists():
+                    shutil.rmtree(d)
+            except OSError:
+                raise AppError("기록 파일을 삭제하지 못했습니다. 열린 보고서를 닫고 다시 시도해 주세요.") from None
             self._sessions.pop(session_id)
             self._seq.pop(session_id, None)
-            d = self.dir_for(session_id)
-            for f in d.glob("*"):
-                f.unlink()
-            d.rmdir()
 
     # ---- append-only logs ----
 

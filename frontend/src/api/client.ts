@@ -6,6 +6,7 @@ export type Schemas = components["schemas"];
 export type Device = Schemas["Device"];
 export type DeviceInfo = Schemas["DeviceInfo"];
 export type PackageItem = Schemas["PackageItem"];
+export type PlayPackage = Schemas["PlayPackage"];
 export type Preset = Schemas["Preset"];
 export type Session = Schemas["Session"];
 export type SessionEvent = Schemas["SessionEvent"];
@@ -56,15 +57,17 @@ function url(path: string, query?: Query): string {
   return `${API_BASE}${path}${s ? `?${s}` : ""}`;
 }
 
-export async function request<T>(method: string, path: string, opts: { query?: Query; body?: unknown } = {}): Promise<T> {
+export async function request<T>(method: string, path: string, opts: { query?: Query; body?: unknown; signal?: AbortSignal } = {}): Promise<T> {
   let resp: Response;
   try {
     resp = await fetch(url(path, opts.query), {
       method,
       headers: opts.body === undefined ? undefined : { "Content-Type": "application/json" },
       body: opts.body === undefined ? undefined : JSON.stringify(opts.body),
+      ...(opts.signal ? { signal: opts.signal } : {}),
     });
   } catch (e) {
+    if (opts.signal?.aborted) throw e;
     throw new ApiError(0, "network_error", e instanceof Error ? e.message : String(e), null);
   }
   if (!resp.ok) throw await toApiError(resp);
@@ -75,7 +78,17 @@ export async function request<T>(method: string, path: string, opts: { query?: Q
 const enc = encodeURIComponent;
 
 export const api = {
+  deploymentStatus: () => request<Schemas["DeploymentStatus"]>("GET", "/settings/deployment"),
+  unlockDeployment: (password: string) => request<Schemas["DeploymentStatus"]>("POST", "/settings/deployment/unlock", { body: { password } }),
   health: () => request<Schemas["Health"]>("GET", "/health"),
+  aiSettings: () => request<Schemas["AiSettingsOut"]>("GET", "/settings/ai"),
+  saveAiSettings: (body: Schemas["AiSettingsIn"]) => request<Schemas["AiSettingsOut"]>("PUT", "/settings/ai", { body }),
+  deleteAiSettings: () => request<Schemas["AiSettingsOut"]>("DELETE", "/settings/ai"),
+  performancePreview: (id: string) => request<Schemas["AnalysisPreview"]>("GET", `/sessions/${enc(id)}/performance-analysis/preview`),
+  analyzePerformance: (id: string, inputHash: string) => request<Schemas["PerformanceAnalysis"]>("POST", `/sessions/${enc(id)}/performance-analysis`, {
+    body: { input_hash: inputHash, consent: true },
+  }),
+  sessionTiming: (id: string) => request<Schemas["SessionTimingOut"]>("GET", `/sessions/${enc(id)}/timing`),
   presets: () => request<Schemas["PresetList"]>("GET", "/presets").then((r) => r.items),
   estimate: (body: Schemas["EstimateIn"]) => request<Estimate>("POST", "/estimates", { body }),
   devices: () => request<Schemas["DeviceList"]>("GET", "/devices").then((r) => r.items),
@@ -90,9 +103,18 @@ export const api = {
   launch: (serial: string, pkg: string) => request<void>("POST", `/devices/${enc(serial)}/packages/${enc(pkg)}/launch`),
   packageVersion: (serial: string, pkg: string) =>
     request<Schemas["PackageVersion"]>("GET", `/devices/${enc(serial)}/packages/${enc(pkg)}`),
-  packages: (serial: string, query?: string, includeSystem = false) =>
+  playPackage: (pkg: string) => request<PlayPackage>("GET", `/play/packages/${enc(pkg)}`),
+  appIcon: (serial: string, pkg: string, signal?: AbortSignal) =>
+    request<Schemas["AppIcon"]>("GET", `/devices/${enc(serial)}/packages/${enc(pkg)}/icon`, { signal }),
+  playAuthStatus: () => request<Schemas["PlayAuthStatus"]>("GET", "/play/auth"),
+  configurePlayClient: (content: string) =>
+    request<Schemas["PlayAuthStatus"]>("POST", "/play/auth/client", { body: { client_json: content } }),
+  connectPlay: () => request<Schemas["PlayAuthStatus"]>("POST", "/play/auth/connect"),
+  checkPlay: () => request<Schemas["PlayAuthStatus"]>("POST", "/play/auth/check"),
+  disconnectPlay: () => request<Schemas["PlayAuthStatus"]>("DELETE", "/play/auth"),
+  packages: (serial: string, query?: string, includeSystem = false, refresh = false) =>
     request<Schemas["PackageList"]>("GET", `/devices/${enc(serial)}/packages`, {
-      query: { query, include_system: includeSystem },
+      query: { query, include_system: includeSystem, refresh: refresh || undefined },
     }),
   sessions: () => request<Schemas["SessionList"]>("GET", "/sessions").then((r) => r.items),
   session: (id: string) => request<Session>("GET", `/sessions/${enc(id)}`),
@@ -108,6 +130,7 @@ export const api = {
     request<Schemas["LogList"]>("GET", "/logs", { query: q }),
   report: (id: string) => request<Schemas["SessionReport"]>("GET", `/sessions/${enc(id)}/report`),
   reportUrl: (id: string, kind: "html" | "xlsx") => `${API_BASE}/sessions/${enc(id)}/report.${kind}`,
+  exportExcel: (id: string) => request<Schemas["ReportExportOut"]>("POST", `/sessions/${enc(id)}/exports/xlsx`),
   logcatUrl: (id: string, run: number) => `${API_BASE}/sessions/${enc(id)}/logcat/${run}`,
   streamUrl: (id: string) => `${API_BASE}/sessions/${enc(id)}/events/stream`,
 };
