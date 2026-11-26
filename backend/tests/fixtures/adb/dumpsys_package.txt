@@ -1,0 +1,7 @@
+Packages:
+  Package [com.example.app] (a1b2c3):
+    userId=10242
+    pkg=Package{d4e5f6 com.example.app}
+    versionCode=4021 minSdk=26 targetSdk=34
+    versionName=4.2.1
+    splits=[base]

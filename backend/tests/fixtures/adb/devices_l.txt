@@ -1,0 +1,6 @@
+List of devices attached
+R3CN30ABCDE            device usb:1-1 product:o1sksx model:SM_G991N device:o1s transport_id:1
+192.168.0.23:5555      device product:panther model:Pixel_7 device:panther transport_id:3
+emulator-5554          offline transport_id:4
+ZY22XYZ                unauthorized usb:1-2 transport_id:5
+

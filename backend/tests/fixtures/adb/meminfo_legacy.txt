@@ -1,0 +1,6 @@
+** MEMINFO in pid 4321 [com.example.app] **
+                   Pss  Private  Private  Swapped     Heap     Heap     Heap
+                 Total    Dirty    Clean    Dirty     Size    Alloc     Free
+                ------   ------   ------   ------   ------   ------   ------
+  Native Heap     8000     7900        0        0    16000    12000     4000
+        TOTAL    51200    40000     5000        0    30000    20000    10000

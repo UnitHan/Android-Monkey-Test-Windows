@@ -1,0 +1,4 @@
+USER           PID  PPID     VSZ    RSS WCHAN            ADDR S NAME
+root             1     0 10900000  9000 0                   0 S init
+u0_a242      11600  1095 21838128 99956 0                   0 S com.example.app:push
+u0_a242      11509  1095 21838128 259956 0                  0 S com.example.app

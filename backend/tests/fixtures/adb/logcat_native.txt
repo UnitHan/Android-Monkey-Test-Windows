@@ -1,0 +1,6 @@
+11-26 10:20:00.000 12000 12000 F libc    : Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x0 in tid 12000 (com.example.app)
+11-26 10:20:00.100 12100 12100 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-26 10:20:00.100 12100 12100 F DEBUG   : Build fingerprint: 'samsung/o1sksx/o1s:14/UP1A/G991NKSU:user/release-keys'
+11-26 10:20:00.100 12100 12100 F DEBUG   : pid: 12000, tid: 12000, name: example.app  >>> com.example.app <<<
+11-26 10:20:00.100 12100 12100 F DEBUG   : signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x0
+11-26 10:20:00.100 12100 12100 F DEBUG   :     #00 pc 000000000004a1b4  /data/app/lib/arm64/libnative.so

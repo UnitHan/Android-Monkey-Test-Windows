@@ -1,0 +1,61 @@
+"""Devices, wireless connection, installed packages."""
+
+from __future__ import annotations
+
+from fastapi import APIRouter, Depends, Path
+
+from monkey_api.api.container import Container, get_container
+from monkey_api.api.errors import problem_responses
+from monkey_api.api.schemas import ConnectIn, ConnectOut, DeviceList, PackageList, PairIn, PairOut
+from monkey_api.domain.models import PACKAGE_PATTERN, DeviceInfo, PackageVersion
+
+router = APIRouter(prefix="/devices", tags=["devices"])
+
+_ADB_ERRORS = problem_responses(404, 422, 502, 503, 504)
+Serial = Path(min_length=1, max_length=128)
+PackageName = Path(pattern=PACKAGE_PATTERN)
+
+
+@router.get("", response_model=DeviceList, responses=_ADB_ERRORS)
+async def list_devices(c: Container = Depends(get_container)) -> DeviceList:
+    return DeviceList(items=await c.ops.list_devices())
+
+
+@router.post("/connect", response_model=ConnectOut, responses=_ADB_ERRORS)
+async def connect(body: ConnectIn, c: Container = Depends(get_container)) -> ConnectOut:
+    return ConnectOut(serial=await c.ops.connect(body.host, body.port))
+
+
+@router.post("/pair", response_model=PairOut, responses=_ADB_ERRORS)
+async def pair(body: PairIn, c: Container = Depends(get_container)) -> PairOut:
+    return PairOut(message=await c.ops.pair(body.host, body.port, body.code))
+
+
+@router.get("/{serial}", response_model=DeviceInfo, responses=_ADB_ERRORS)
+async def device_info(serial: str = Serial, c: Container = Depends(get_container)) -> DeviceInfo:
+    return await c.ops.device_info(serial)
+
+
+@router.post("/{serial}/disconnect", status_code=204, responses=_ADB_ERRORS)
+async def disconnect(serial: str = Serial, c: Container = Depends(get_container)) -> None:
+    await c.ops.disconnect(serial)
+
+
+@router.get("/{serial}/packages", response_model=PackageList, responses=_ADB_ERRORS)
+async def list_packages(
+    serial: str = Serial,
+    query: str | None = None,
+    include_system: bool = False,
+    third_party: bool = False,
+    c: Container = Depends(get_container),
+) -> PackageList:
+    await c.ops.require_device(serial)
+    items = await c.packages.list(serial, query=query, include_system=include_system, third_party=third_party)
+    return PackageList(items=items, total=len(items))
+
+
+@router.get("/{serial}/packages/{package}", response_model=PackageVersion, responses=_ADB_ERRORS)
+async def package_version(
+    serial: str = Serial, package: str = PackageName, c: Container = Depends(get_container)
+) -> PackageVersion:
+    return await c.packages.version(serial, package)
