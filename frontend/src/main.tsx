@@ -8,7 +8,11 @@ import "./styles.css";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: (count, err) => !(err instanceof ApiError && err.status >= 400 && err.status < 500) && count < 2,
+      // backend not up yet (network error / proxy 5xx without problem body): keep retrying; 4xx never; others twice
+      retry: (count, err) =>
+        err instanceof ApiError && (err.code === "network_error" || err.code.startsWith("http_5")) ? count < 60
+          : !(err instanceof ApiError && err.status >= 400 && err.status < 500) && count < 2,
+      retryDelay: (count) => Math.min(500 * 2 ** count, 4000),
       refetchOnWindowFocus: false,
     },
   },

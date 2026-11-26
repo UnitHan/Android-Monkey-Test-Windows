@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import type { PerfSample } from "../api/client";
 
-const W = 600, H = 200, PAD = { l: 44, r: 12, t: 12, b: 28 };
+const W = 960, H = 230, PAD = { l: 44, r: 12, t: 12, b: 28 };
 
 function niceMax(v: number): number {
   if (v <= 0) return 1;
@@ -55,13 +55,13 @@ export function PerfChart(props: {
     <figure className="chart" style={{ margin: 0 }}>
       <figcaption className="row">
         <b>{props.title}</b>
-        <span className="muted small">현재 {latest != null ? `${latest.toFixed(1)} ${props.unit}` : "-"}</span>
-        <button className="small" style={{ marginLeft: "auto" }} onClick={() => setTable((t) => !t)} aria-pressed={table}>
+        <span className="c-gray small">현재 {latest != null ? `${latest.toFixed(1)} ${props.unit}` : "-"}</span>
+        <button type="button" className="tk-btn" style={{ marginLeft: "auto" }} onClick={() => setTable((t) => !t)} aria-pressed={table}>
           {table ? "차트" : "표"}
         </button>
       </figcaption>
       {table ? (
-        <div className="scroll" style={{ maxHeight: 220 }}>
+        <div className="tk-tree" style={{ maxHeight: 260 }}>
           <table>
             <thead><tr><th>시각</th><th>회차</th><th>{props.title}</th></tr></thead>
             <tbody>
@@ -72,7 +72,7 @@ export function PerfChart(props: {
           </table>
         </div>
       ) : n === 0 ? (
-        <p className="muted small">아직 데이터가 없습니다.</p>
+        <p className="c-gray small">아직 데이터가 없습니다.</p>
       ) : (
         <>
           <svg
@@ -85,29 +85,29 @@ export function PerfChart(props: {
           >
             {ticks.map((t) => (
               <g key={t}>
-                <line x1={PAD.l} x2={W - PAD.r} y1={y(t)} y2={y(t)} stroke="var(--line)" strokeWidth={1} />
-                <text x={PAD.l - 6} y={y(t) + 5} textAnchor="end" fontSize="15" fill="var(--ink-2)">
+                <line x1={PAD.l} x2={W - PAD.r} y1={y(t)} y2={y(t)} stroke="#e7e7e7" strokeWidth={1} />
+                <text x={PAD.l - 6} y={y(t) + 5} textAnchor="end" fontSize="15" fill="#666666">
                   {Math.round(t)}
                 </text>
               </g>
             ))}
-            <line x1={PAD.l} x2={W - PAD.r} y1={y(0)} y2={y(0)} stroke="var(--axis)" strokeWidth={1} />
-            <text x={PAD.l} y={H - 8} fontSize="15" fill="var(--ink-2)">{new Date(samples[0].at).toLocaleTimeString()}</text>
-            <text x={W - PAD.r} y={H - 8} fontSize="15" fill="var(--ink-2)" textAnchor="end">
+            <line x1={PAD.l} x2={W - PAD.r} y1={y(0)} y2={y(0)} stroke="#c2c2c2" strokeWidth={1} />
+            <text x={PAD.l} y={H - 8} fontSize="15" fill="#666666">{new Date(samples[0].at).toLocaleTimeString()}</text>
+            <text x={W - PAD.r} y={H - 8} fontSize="15" fill="#666666" textAnchor="end">
               {new Date(samples[n - 1].at).toLocaleTimeString()}
             </text>
             <path d={path} fill="none" stroke={props.color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
             {hover != null && (
               <g>
-                <line x1={x(hover)} x2={x(hover)} y1={PAD.t} y2={y(0)} stroke="var(--axis)" strokeWidth={1} />
-                {hv != null && <circle cx={x(hover)} cy={y(hv)} r={4} fill={props.color} stroke="var(--surface)" strokeWidth={2} />}
+                <line x1={x(hover)} x2={x(hover)} y1={PAD.t} y2={y(0)} stroke="#c2c2c2" strokeWidth={1} />
+                {hv != null && <circle cx={x(hover)} cy={y(hv)} r={4} fill={props.color} stroke="#ffffff" strokeWidth={2} />}
               </g>
             )}
           </svg>
           {hover != null && (
             <div className="tooltip" style={{ left: `${(x(hover) / W) * 100}%`, top: 24, transform: "translateX(-50%)" }}>
               <b>{hv != null ? `${hv.toFixed(1)} ${props.unit}` : "-"}</b>{" "}
-              <span className="muted">
+              <span className="c-gray">
                 {new Date(samples[hover].at).toLocaleTimeString()} · {samples[hover].run}회차
               </span>
             </div>

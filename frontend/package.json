@@ -9,7 +9,9 @@
     "typecheck": "tsc -b",
     "test": "vitest run",
     "gen:api": "openapi-typescript ../backend/openapi.json -o src/api/schema.d.ts",
-    "check:api": "openapi-typescript ../backend/openapi.json -o src/api/schema.d.ts && git diff --exit-code -- src/api/schema.d.ts"
+    "check:api": "openapi-typescript ../backend/openapi.json -o src/api/schema.d.ts && git diff --exit-code -- src/api/schema.d.ts",
+    "tauri": "tauri",
+    "setup:backend": "python ../backend/scripts/setup_venv.py"
   },
   "dependencies": {
     "@tanstack/react-query": "5.62.0",
@@ -17,6 +19,7 @@
     "react-dom": "18.3.1"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.12.4",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
     "@vitejs/plugin-react": "4.3.4",

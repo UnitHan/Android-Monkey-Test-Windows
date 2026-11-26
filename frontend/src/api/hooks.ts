@@ -21,7 +21,9 @@ export const keys = {
 export const TERMINAL = new Set(["completed", "failed", "cancelled"]);
 const PERF_WINDOW = 3600;
 
-export const useHealth = () => useQuery({ queryKey: keys.health, queryFn: api.health, refetchInterval: 10_000 });
+/** Retries forever: in the desktop shell the backend may still be starting when the window opens. */
+export const useHealth = () =>
+  useQuery({ queryKey: keys.health, queryFn: api.health, refetchInterval: 10_000, retry: true, retryDelay: 500 });
 export const usePresets = () => useQuery({ queryKey: keys.presets, queryFn: api.presets, staleTime: Infinity });
 export const useDevices = () => useQuery({ queryKey: keys.devices, queryFn: api.devices, refetchInterval: 5_000 });
 export const useDevice = (serial: string | null) =>

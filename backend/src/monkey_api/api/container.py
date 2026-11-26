@@ -27,6 +27,7 @@ class Container:
     ledger: SessionLedger
     sessions: SessionService
     packages: PackageService
+    ai_advisor: bool
 
 
 def build_container(
@@ -45,6 +46,7 @@ def build_container(
         ledger=ledger,
         sessions=SessionService(ledger, runner),
         packages=PackageService(ops),
+        ai_advisor=not isinstance(advisor, NoAdvisor),
     )
 
 

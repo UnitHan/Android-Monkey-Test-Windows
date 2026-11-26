@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Path
 
 from monkey_api.api.container import Container, get_container
 from monkey_api.api.errors import problem_responses
-from monkey_api.api.schemas import ConnectIn, ConnectOut, DeviceList, PackageList, PairIn, PairOut
+from monkey_api.api.schemas import AcceptedOut, ConnectIn, ConnectOut, DeviceList, PackageList, PairIn, PairOut, TcpipIn
 from monkey_api.domain.models import PACKAGE_PATTERN, DeviceInfo, PackageVersion
 
 router = APIRouter(prefix="/devices", tags=["devices"])
@@ -41,6 +41,21 @@ async def disconnect(serial: str = Serial, c: Container = Depends(get_container)
     await c.ops.disconnect(serial)
 
 
+@router.post("/{serial}/tcpip", status_code=202, response_model=AcceptedOut, responses=_ADB_ERRORS)
+async def enable_tcpip(body: TcpipIn, serial: str = Serial, c: Container = Depends(get_container)) -> AcceptedOut:
+    """Switch a USB device to wireless debugging on `port` (then POST /devices/connect)."""
+    await c.ops.require_device(serial)
+    await c.ops.enable_tcpip(serial, body.port)
+    return AcceptedOut(message=f"tcpip enabled on {body.port}")
+
+
+@router.post("/{serial}/reboot", status_code=202, response_model=AcceptedOut, responses=_ADB_ERRORS)
+async def reboot(serial: str = Serial, c: Container = Depends(get_container)) -> AcceptedOut:
+    await c.ops.require_device(serial)
+    await c.ops.reboot(serial)
+    return AcceptedOut(message="reboot requested")
+
+
 @router.get("/{serial}/packages", response_model=PackageList, responses=_ADB_ERRORS)
 async def list_packages(
     serial: str = Serial,
@@ -59,3 +74,11 @@ async def package_version(
     serial: str = Serial, package: str = PackageName, c: Container = Depends(get_container)
 ) -> PackageVersion:
     return await c.packages.version(serial, package)
+
+
+@router.post("/{serial}/packages/{package}/launch", status_code=204, responses=_ADB_ERRORS)
+async def launch_package(
+    serial: str = Serial, package: str = PackageName, c: Container = Depends(get_container)
+) -> None:
+    await c.ops.require_device(serial)
+    await c.ops.launch(serial, package)

@@ -28,6 +28,7 @@ async def health(c: Container = Depends(get_container)) -> Health:
         status="ok" if version else "degraded",
         version=__version__,
         adb=AdbStatus(path=c.settings.adb_path, available=version is not None, version=version),
+        ai_advisor=c.ai_advisor,
     )
 
 

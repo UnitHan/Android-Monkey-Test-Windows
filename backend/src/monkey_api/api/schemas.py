@@ -34,6 +34,7 @@ class Health(BaseModel):
     status: Literal["ok", "degraded"]
     version: str
     adb: AdbStatus
+    ai_advisor: bool
 
 
 class DeviceList(BaseModel):
@@ -49,8 +50,16 @@ class PairIn(ConnectIn):
     code: str = Field(pattern=r"^\d{6}$")
 
 
+class TcpipIn(In):
+    port: int = Field(default=5555, ge=1, le=65535)
+
+
 class ConnectOut(BaseModel):
     serial: str
+
+
+class AcceptedOut(BaseModel):
+    message: str
 
 
 class PairOut(BaseModel):

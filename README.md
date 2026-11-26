@@ -7,7 +7,7 @@ v3(Python/tkinter)는 [legacy/](legacy/)에 보관되어 있고 git 태그 `lega
 
 ```
 backend/    FastAPI REST API (/api/v1), 세션 상태머신, ADB 어댑터, API 로그
-frontend/   React + TanStack Query UI (빌드 결과를 백엔드가 서빙)
+frontend/   React + TanStack Query UI (v3 화면 구성/테마 계승), src-tauri/ 데스크톱 셸
 docs/       ARCHITECTURE.md (설계/계약/로깅/테스트 규칙), MIGRATION.md (v3 → v4)
 assets/     앱 아이콘 (Tauri 패키징용)
 legacy/     v3 소스 아카이브 (수정 금지)
@@ -15,22 +15,30 @@ legacy/     v3 소스 아카이브 (수정 금지)
 
 ## 요구 사항
 
-- Python 3.12+ 와 [uv](https://docs.astral.sh/uv/) (`python -m pip install uv`)
-- Node.js 20+ (UI 빌드 시)
+- Python 3.12+ (백엔드는 `backend/.venv` 가상환경에서 실행)
+- Node.js 20+
+- Rust (stable, MSVC) + WebView2 — Tauri 데스크톱 앱용
 - adb: Android SDK platform-tools 또는 PATH. 다른 위치면 `MONKEY_ADB_PATH` 지정
 
-## 실행
+## 실행 (데스크톱 앱)
 
 ```bash
-# 1) UI 빌드 (최초 1회 / UI 변경 시)
-cd frontend && npm install && npm run build
-
-# 2) API + UI 서버
-cd ../backend && python -m uv sync && python -m uv run monkey-api
-# → http://127.0.0.1:8765  (API 문서: /docs)
+cd frontend
+npm install
+npm run setup:backend   # backend/.venv 생성 + 백엔드 설치 (python -m venv + pip)
+npm run tauri dev       # Vite + Tauri 창 실행, 백엔드는 셸이 .venv 의 python 으로 자동 기동/종료
 ```
 
-UI 개발 시에는 `cd frontend && npm run dev` (5173 포트, /api 는 8765 로 프록시).
+- 백엔드가 이미 8765 포트에서 실행 중이면 셸은 그것을 재사용합니다.
+- 백엔드 위치를 바꾸려면 `MONKEY_BACKEND_DIR` 를 지정합니다.
+
+### 백엔드만 실행 (브라우저/API 개발)
+
+```bash
+cd backend
+.venv\Scripts\activate          # PowerShell: .venv\Scripts\Activate.ps1
+monkey-api                        # http://127.0.0.1:8765  (API 문서: /docs, 빌드된 UI도 서빙)
+```
 
 ## 설정 (환경 변수, 접두사 `MONKEY_`, `backend/.env` 지원)
 
@@ -46,15 +54,15 @@ UI 개발 시에는 `cd frontend && npm run dev` (5173 포트, /api 는 8765 로
 
 모든 응답에 `X-Request-ID`가 붙고, 오류는 `application/problem+json`으로 `request_id`를 포함합니다.
 `GET /api/v1/logs?request_id=...` 또는 `?session_id=...` 로 해당 요청/세션의 HTTP, ADB 호출, 세션 이벤트
-로그를 모두 볼 수 있습니다. UI의 "API 로그" 탭과 오류 메시지의 "로그 보기" 버튼이 같은 기능입니다.
+로그를 모두 볼 수 있습니다. 앱의 "콘솔 로그" 패널이 같은 로그를 실시간으로 보여 주고, 오류 메시지에는 `request_id`가 표시됩니다.
 
 ## 개발
 
 ```bash
-cd backend
-python -m uv run pytest                       # 단위 + API 계약 테스트 (기기 불필요)
-python -m uv run ruff check src tests && python -m uv run ruff format src tests
-python -m uv run python scripts/export_openapi.py   # API 변경 시 계약 갱신 (리뷰 대상)
+cd backend && .venv\Scripts\activate
+pytest                                   # 단위 + API 계약 테스트 (기기 불필요)
+ruff check src tests && ruff format src tests
+python scripts/export_openapi.py         # API 변경 시 계약 갱신 (리뷰 대상)
 
 cd ../frontend
 npm test            # vitest

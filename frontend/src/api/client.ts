@@ -17,7 +17,7 @@ export type Problem = Schemas["Problem"];
 export type Estimate = Schemas["Estimate"];
 export type SessionCreate = Schemas["SessionCreateIn"];
 
-export const API_BASE = "/api/v1";
+export const API_BASE = `${import.meta.env.VITE_API_ORIGIN ?? ""}/api/v1`;
 
 export class ApiError extends Error {
   constructor(
@@ -83,6 +83,13 @@ export const api = {
   connect: (host: string, port: number) => request<Schemas["ConnectOut"]>("POST", "/devices/connect", { body: { host, port } }),
   pair: (host: string, port: number, code: string) =>
     request<Schemas["PairOut"]>("POST", "/devices/pair", { body: { host, port, code } }),
+  disconnect: (serial: string) => request<void>("POST", `/devices/${enc(serial)}/disconnect`),
+  tcpip: (serial: string, port: number) =>
+    request<Schemas["AcceptedOut"]>("POST", `/devices/${enc(serial)}/tcpip`, { body: { port } }),
+  reboot: (serial: string) => request<Schemas["AcceptedOut"]>("POST", `/devices/${enc(serial)}/reboot`),
+  launch: (serial: string, pkg: string) => request<void>("POST", `/devices/${enc(serial)}/packages/${enc(pkg)}/launch`),
+  packageVersion: (serial: string, pkg: string) =>
+    request<Schemas["PackageVersion"]>("GET", `/devices/${enc(serial)}/packages/${enc(pkg)}`),
   packages: (serial: string, query?: string, includeSystem = false) =>
     request<Schemas["PackageList"]>("GET", `/devices/${enc(serial)}/packages`, {
       query: { query, include_system: includeSystem },
@@ -97,8 +104,9 @@ export const api = {
     request<Schemas["EventList"]>("GET", `/sessions/${enc(id)}/events`, { query: { after_seq: afterSeq } }),
   issues: (id: string) => request<Schemas["IssueList"]>("GET", `/sessions/${enc(id)}/issues`).then((r) => r.items),
   perf: (id: string) => request<Schemas["PerfList"]>("GET", `/sessions/${enc(id)}/perf`).then((r) => r.items),
-  logs: (q: { level?: string; source?: string; session_id?: string; request_id?: string; limit?: number }) =>
+  logs: (q: { level?: string; source?: string; session_id?: string; request_id?: string; since_seq?: number; limit?: number }) =>
     request<Schemas["LogList"]>("GET", "/logs", { query: q }),
+  report: (id: string) => request<Schemas["SessionReport"]>("GET", `/sessions/${enc(id)}/report`),
   reportUrl: (id: string, kind: "html" | "xlsx") => `${API_BASE}/sessions/${enc(id)}/report.${kind}`,
   logcatUrl: (id: string, run: number) => `${API_BASE}/sessions/${enc(id)}/logcat/${run}`,
   streamUrl: (id: string) => `${API_BASE}/sessions/${enc(id)}/events/stream`,

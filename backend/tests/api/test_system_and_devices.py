@@ -109,3 +109,18 @@ def test_unknown_route_is_problem_json(api: ContractClient) -> None:
     resp = api.client.get("/api/v1/nope")
     assert resp.status_code == 404 and resp.json()["code"] == "not_found"
     assert resp.headers["x-request-id"]
+
+
+def test_reboot_and_launch(api: ContractClient, adb: FakeAdb) -> None:
+    assert api.post(f"/devices/{SERIAL}/reboot").json() == {"message": "reboot requested"}
+    assert adb.called("reboot") == 1
+    assert api.post(f"/devices/{SERIAL}/packages/{PACKAGE}/launch").status_code == 204
+    assert any(args[:3] == ("shell", "monkey", "-p") and args[-1] == "1" for args, _ in adb.calls)
+    assert api.post("/devices/NOPE1/reboot").status_code == 404
+    assert api.post(f"/devices/{SERIAL}/packages/bad%20pkg/launch").status_code == 422
+
+
+def test_enable_tcpip(api: ContractClient, adb: FakeAdb) -> None:
+    assert api.post(f"/devices/{SERIAL}/tcpip", json={"port": 5555}).status_code == 202
+    assert (("tcpip", "5555"), SERIAL) in adb.calls
+    assert api.post(f"/devices/{SERIAL}/tcpip", json={"port": 0}).status_code == 422

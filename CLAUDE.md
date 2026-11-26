@@ -11,7 +11,7 @@ Read docs/ARCHITECTURE.md before changing code. Summary of the binding rules:
 - `legacy/` is a read-only archive. Never import from it or edit it.
 
 ## Contract & logging
-- `backend/openapi.json` is the contract. API change → `uv run python scripts/export_openapi.py`,
+- `backend/openapi.json` is the contract. API change → `python scripts/export_openapi.py` (backend venv),
   then `npm run gen:api` in frontend; both diffs are part of the change.
 - Errors are typed (`core/errors.py`) and become RFC 9457 problem+json in `api/errors.py` only.
 - Use `core.logging.log(source, message, level, **data)` — never print or bare f-string logs.
@@ -28,4 +28,8 @@ Read docs/ARCHITECTURE.md before changing code. Summary of the binding rules:
   contract; failures print the API logs for the test's requests.
 - ADB is faked with `tests/fakes.py::FakeAdb` (+ fixture files under `tests/fixtures/adb/`).
   New parsers need a fixture captured from a real device.
-- Run before commit: `uv run pytest`, `uv run ruff check src tests`, `npm test`, `npm run typecheck`.
+- Run before commit (backend venv active): `pytest`, `ruff check src tests`; frontend: `npm test`, `npm run typecheck`.
+
+## UI
+- The UI deliberately mirrors the v3 tkinter screen (ttk clam theme, same layout/labels, connection wizard).
+  Keep new UI consistent with `components/tk.tsx` widgets and `styles.css` tokens; light theme only.

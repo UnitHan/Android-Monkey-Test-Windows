@@ -58,6 +58,12 @@ class DeviceOps:
             return False
         return out.strip() == "ok"
 
+    async def enable_tcpip(self, serial: str, port: int) -> None:
+        await run_checked(self.adb, ["tcpip", str(port)], serial=serial, timeout=15)
+
+    async def reboot(self, serial: str) -> None:
+        await run_checked(self.adb, ["reboot"], serial=serial, timeout=15)
+
     async def restart_server(self) -> None:
         await self.adb.run(["kill-server"], timeout=10)
         await run_checked(self.adb, ["start-server"], timeout=20)
